@@ -10,8 +10,23 @@ use HybridRAG\LanguageModel\LanguageModelInterface;
 use HybridRAG\Logging\Logger;
 use HybridRAG\Exception\HybridRAGException;
 
+/**
+ * Class GraphRAG
+ *
+ * Implements the GraphRAGInterface for Graph-based Retrieval-Augmented Generation.
+ */
 class GraphRAG implements GraphRAGInterface
 {
+    /**
+     * GraphRAG constructor.
+     *
+     * @param KnowledgeGraphBuilder $kg The knowledge graph builder
+     * @param EmbeddingInterface $embedding The embedding interface
+     * @param LanguageModelInterface $languageModel The language model interface
+     * @param Logger $logger The logger instance
+     * @param int $maxDepth The maximum depth for graph traversal
+     * @param float $entitySimilarityThreshold The threshold for entity similarity
+     */
     public function __construct(
         private KnowledgeGraphBuilder $kg,
         private EmbeddingInterface $embedding,
@@ -21,6 +36,15 @@ class GraphRAG implements GraphRAGInterface
         private float $entitySimilarityThreshold = 0.7
     ) {}
 
+    /**
+     * Add an entity to the knowledge graph.
+     *
+     * @param string $id The unique identifier for the entity
+     * @param string $content The content of the entity
+     * @param array $metadata Additional metadata associated with the entity
+     * @return string The ID of the added entity
+     * @throws HybridRAGException If adding the entity fails
+     */
     public function addEntity(string $id, string $content, array $metadata = []): string
     {
         try {
@@ -39,6 +63,16 @@ class GraphRAG implements GraphRAGInterface
         }
     }
 
+    /**
+     * Add a relationship between two entities in the knowledge graph.
+     *
+     * @param string $fromId The ID of the source entity
+     * @param string $toId The ID of the target entity
+     * @param string $type The type of the relationship
+     * @param array $attributes Additional attributes for the relationship
+     * @return string The ID of the added relationship
+     * @throws HybridRAGException If adding the relationship fails
+     */
     public function addRelationship(string $fromId, string $toId, string $type, array $attributes = []): string
     {
         try {
