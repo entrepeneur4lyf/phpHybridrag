@@ -10,10 +10,24 @@ use Psr\SimpleCache\CacheInterface;
 use Phpml\Ensemble\RandomForest;
 use Phpml\Classification\DecisionTree;
 
+/**
+ * Class EnsembleHybridReranker
+ *
+ * This class extends the HybridReranker to implement an ensemble reranking approach using Random Forest.
+ */
 class EnsembleHybridReranker extends HybridReranker
 {
     private RandomForest $randomForest;
 
+    /**
+     * EnsembleHybridReranker constructor.
+     *
+     * @param EmbeddingInterface $embedding The embedding interface
+     * @param VectorDatabaseInterface $vectorDB The vector database interface
+     * @param CacheInterface $cache The cache interface
+     * @param float $bm25Weight The weight for BM25 score
+     * @param float $semanticWeight The weight for semantic score
+     */
     public function __construct(
         EmbeddingInterface $embedding,
         VectorDatabaseInterface $vectorDB,
@@ -25,6 +39,14 @@ class EnsembleHybridReranker extends HybridReranker
         $this->randomForest = new RandomForest();
     }
 
+    /**
+     * Rerank the results using the ensemble approach.
+     *
+     * @param string $query The query string
+     * @param array $results The initial results to rerank
+     * @param int $topK The number of top results to return
+     * @return array The reranked results
+     */
     public function rerank(string $query, array $results, int $topK): array
     {
         $rerankedResults = parent::rerank($query, $results, $topK);
@@ -37,6 +59,13 @@ class EnsembleHybridReranker extends HybridReranker
         return array_slice($rerankedResults, 0, $topK);
     }
 
+    /**
+     * Extract features from the query and results for the Random Forest model.
+     *
+     * @param string $query The query string
+     * @param array $results The results to extract features from
+     * @return array The extracted features
+     */
     private function extractFeatures(string $query, array $results): array
     {
         $features = [];
@@ -52,6 +81,13 @@ class EnsembleHybridReranker extends HybridReranker
         return $features;
     }
 
+    /**
+     * Calculate the overlap between the query and content tokens.
+     *
+     * @param string $query The query string
+     * @param string $content The content to compare with
+     * @return float The overlap score
+     */
     private function calculateQueryOverlap(string $query, string $content): float
     {
         $queryTokens = $this->tokenize($query);
