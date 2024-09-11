@@ -43,7 +43,7 @@ class Configuration
         if (!is_array($config)) {
             throw new HybridRAGException("Configuration file does not return an array");
         }
-        $this->config = $config;
+        $this->config = $this->replaceEnvVariables($config);
     }
 
     /**
