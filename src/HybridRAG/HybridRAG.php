@@ -58,12 +58,11 @@ class HybridRAG implements HybridRAGInterface
      */
     private function initializeLogger(): void
     {
-        $logConfig = $this->config->get('logging');
         $this->logger = new Logger(
-            $logConfig['name'] ?? 'default_logger',
-            $logConfig['path'] ?? '/tmp/default.log',
-            $logConfig['level'] ?? 'INFO',
-            $logConfig['debug_mode'] ?? false
+            $this->config->logging['name'] ?? 'default_logger',
+            $this->config->logging['path'] ?? '/tmp/default.log',
+            $this->config->logging['level'] ?? 'INFO',
+            $this->config->logging['debug_mode'] ?? false
         );
     }
 
@@ -77,7 +76,7 @@ class HybridRAG implements HybridRAGInterface
         try {
             $this->nerClassifier = new NERClassifier();
             $this->topicModeler = new LDATopicModeler();
-            $lexiconPath = $this->config->get('sentiment_analysis.lexicon_path');
+            $lexiconPath = $this->config->sentiment_analysis['lexicon_path'];
             if ($lexiconPath === null) {
                 throw new HybridRAGException('Lexicon path for sentiment analysis is not configured.');
             }
@@ -144,8 +143,8 @@ class HybridRAG implements HybridRAGInterface
         try {
             $this->logger->info("Retrieving context", ['query' => $query]);
             
-            $topK = $this->config->get('hybridrag.top_k') ?? 5; // Default value if not set
-            $maxDepth = $this->config->get('hybridrag.max_depth') ?? 2; // Default value if not set
+            $topK = $this->config->hybridrag['top_k'] ?? 5; // Default value if not set
+            $maxDepth = $this->config->hybridrag['max_depth'] ?? 2; // Default value if not set
 
             $vectorContext = $this->vectorRAG->retrieveContext($query, $topK);
             $graphContext = $this->graphRAG->retrieveContext($query, $maxDepth);
@@ -158,7 +157,7 @@ class HybridRAG implements HybridRAGInterface
             $querySentiment = $this->sentimentAnalyzer->analyzeSentiment($query);
             $mergedContext = $this->incorporateSentiment($mergedContext, $querySentiment);
 
-            $rerankedContext = $this->reranker->rerank($query, $mergedContext, $this->config->get('reranker.top_k'));
+            $rerankedContext = $this->reranker->rerank($query, $mergedContext, $this->config->reranker['top_k']);
 
             $this->logger->info("Context retrieved successfully", ['query' => $query, 'context_size' => count($rerankedContext)]);
             
@@ -205,7 +204,7 @@ class HybridRAG implements HybridRAGInterface
     private function mergeContext(array $vectorContext, array $graphContext): array
     {
         $mergedContext = [];
-        $vectorScore = $this->config->get('hybridrag.vector_weight');
+        $vectorScore = $this->config->hybridrag['vector_weight'];
         $graphScore = 1 - $vectorScore;
 
         foreach ($vectorContext as $item) {
