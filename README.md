@@ -74,31 +74,51 @@ Now ChromaDB will be available at `http://localhost:8000` and ArangoDB at `http:
 
 ## Configuration
 
-1. Copy the `config/config.yaml.example` to `config/config.yaml`.
-2. Edit `config/config.yaml` and fill in your configuration details:
+1. Copy the `config/config.php.example` to `config/config.php` (if it doesn't already exist).
+2. Edit `config/config.php` and fill in your configuration details:
 
-```yaml
-openai:
-  api_key: "your-openai-api-key"
+```php
+<?php
 
-arangodb:
-  host: "localhost"
-  port: 8529
-  database: "hybrid_rag"
-  username: "root"
-  password: "your_root_password"
-
-chromadb:
-  host: "localhost"
-  port: 8000
-  collection: "hybrid_rag"
-
-logging:
-  name: "hybrid_rag"
-  path: "/path/to/your/log/file.log"
-  level: "info"
-  debug_mode: false
+return [
+    'chromadb' => [
+        'host' => getenv('CHROMADB_HOST') ?? 'localhost',
+        'port' => getenv('CHROMADB_PORT') ?? 8000,
+        'persistence' => true,
+        'collection' => getenv('CHROMADB_COLLECTION') ?? null,
+    ],
+    'arangodb' => [
+        'host' => getenv('ARANGODB_HOST') ?? 'localhost',
+        'port' => getenv('ARANGODB_PORT') ?? 8529,
+        'database' => getenv('ARANGODB_DATABASE') ?? 'hybridrag',
+        'username' => getenv('ARANGODB_USERNAME') ?? null,
+        'password' => getenv('ARANGODB_PASSWORD') ?? null,
+    ],
+    'openai' => [
+        'api_key' => getenv('OPENAI_API_KEY') ?? null,
+        'api_base_url' => getenv('OPENAI_API_BASE_URL') ?? 'https://api.openai.com/v1/',
+        'embedding_model' => getenv('OPENAI_EMBEDDING_MODEL') ?? 'text-embedding-3-small',
+        'language_model' => [
+            'model' => getenv('OPENAI_LANGUAGE_MODEL') ?? 'gpt-4-turbo',
+            'temperature' => 0.7,
+            'max_tokens' => 4096,
+            'top_p' => 1,
+            'frequency_penalty' => 0,
+            'presence_penalty' => 0,
+        ],
+        'cache_ttl' => 86400,
+    ],
+    'logging' => [
+        'name' => 'hybridrag',
+        'path' => dirname(__FILE__) . '/logs/hybridrag.log',
+        'level' => 'info',
+        'debug_mode' => false,
+    ],
+    // Other configuration options...
+];
 ```
+
+You can customize these values or use environment variables for sensitive information.
 
 ## Usage
 
