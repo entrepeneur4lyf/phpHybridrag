@@ -95,4 +95,16 @@ class EnsembleHybridReranker extends HybridReranker
         $overlap = array_intersect($queryTokens, $contentTokens);
         return count($overlap) / count($queryTokens);
     }
+
+    /**
+     * Tokenize the given text.
+     *
+     * @param string $text The text to tokenize
+     * @return array An array of tokens
+     */
+    private function tokenize(string $text): array
+    {
+        // Implement tokenization logic here
+        return explode(' ', strtolower($text));
+    }
 }

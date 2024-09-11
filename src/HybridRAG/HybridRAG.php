@@ -16,6 +16,12 @@ use HybridRAG\Config\Configuration;
 use HybridRAG\Logging\Logger;
 use HybridRAG\Exception\HybridRAGException;
 
+/**
+ * Class HybridRAG
+ *
+ * This class implements the HybridRAGInterface and provides the main functionality
+ * for the Hybrid Retrieval-Augmented Generation system.
+ */
 class HybridRAG implements HybridRAGInterface
 {
     private NERClassifier $nerClassifier;
@@ -26,6 +32,15 @@ class HybridRAG implements HybridRAGInterface
     private Configuration $config;
     private Logger $logger;
 
+    /**
+     * HybridRAG constructor.
+     *
+     * @param VectorRAGInterface $vectorRAG The VectorRAG component
+     * @param GraphRAGInterface $graphRAG The GraphRAG component
+     * @param RerankerInterface $reranker The reranker component
+     * @param LanguageModelInterface $languageModel The language model component
+     * @param Configuration $config The configuration object
+     */
     public function __construct(
         private VectorRAGInterface $vectorRAG,
         private GraphRAGInterface $graphRAG,
@@ -38,6 +53,9 @@ class HybridRAG implements HybridRAGInterface
         $this->initializeComponents();
     }
 
+    /**
+     * Initialize the logger.
+     */
     private function initializeLogger(): void
     {
         $logConfig = $this->config->get('logging');
@@ -49,6 +67,11 @@ class HybridRAG implements HybridRAGInterface
         );
     }
 
+    /**
+     * Initialize the components.
+     *
+     * @throws HybridRAGException If initialization fails
+     */
     private function initializeComponents(): void
     {
         try {
@@ -64,6 +87,14 @@ class HybridRAG implements HybridRAGInterface
         }
     }
 
+    /**
+     * Add a document to the system.
+     *
+     * @param string $id The document ID
+     * @param string $content The document content
+     * @param array $metadata Additional metadata
+     * @throws HybridRAGException If adding the document fails
+     */
     public function addDocument(string $id, string $content, array $metadata = []): void
     {
         try {
@@ -97,6 +128,13 @@ class HybridRAG implements HybridRAGInterface
         }
     }
 
+    /**
+     * Retrieve context for a given query.
+     *
+     * @param string $query The query string
+     * @return array The retrieved context
+     * @throws HybridRAGException If retrieving context fails
+     */
     public function retrieveContext(string $query): array
     {
         try {
@@ -124,6 +162,14 @@ class HybridRAG implements HybridRAGInterface
         }
     }
 
+    /**
+     * Generate an answer for a given query and context.
+     *
+     * @param string $query The query string
+     * @param array $context The context array
+     * @return string The generated answer
+     * @throws HybridRAGException If generating the answer fails
+     */
     public function generateAnswer(string $query, array $context): string
     {
         try {
@@ -142,6 +188,13 @@ class HybridRAG implements HybridRAGInterface
         }
     }
 
+    /**
+     * Merge vector and graph contexts.
+     *
+     * @param array $vectorContext The vector context
+     * @param array $graphContext The graph context
+     * @return array The merged context
+     */
     private function mergeContext(array $vectorContext, array $graphContext): array
     {
         $mergedContext = [];
@@ -179,6 +232,13 @@ class HybridRAG implements HybridRAGInterface
         return $mergedContext;
     }
 
+    /**
+     * Find existing context in the merged context array.
+     *
+     * @param array $mergedContext The merged context array
+     * @param string $id The ID to search for
+     * @return int|false The index of the found context or false if not found
+     */
     private function findExistingContext(array $mergedContext, string $id): int|false
     {
         foreach ($mergedContext as $index => $item) {
@@ -189,6 +249,12 @@ class HybridRAG implements HybridRAGInterface
         return false;
     }
 
+    /**
+     * Format context for the language model.
+     *
+     * @param array $context The context array
+     * @return string The formatted context string
+     */
     private function formatContextForLLM(array $context): string
     {
         $formattedContext = "";
@@ -200,6 +266,13 @@ class HybridRAG implements HybridRAGInterface
         return $formattedContext;
     }
 
+    /**
+     * Construct a prompt for the language model.
+     *
+     * @param string $query The query string
+     * @param string $context The formatted context
+     * @return string The constructed prompt
+     */
     private function constructPrompt(string $query, string $context): string
     {
         return <<<EOT
@@ -214,6 +287,12 @@ class HybridRAG implements HybridRAGInterface
         EOT;
     }
 
+    /**
+     * Extract entities from the given content.
+     *
+     * @param string $content The content to extract entities from
+     * @return array The extracted entities
+     */
     private function extractEntities(string $content): array
     {
         $tokens = explode(' ', $content); // Simple tokenization
@@ -229,6 +308,9 @@ class HybridRAG implements HybridRAGInterface
         return $entities;
     }
 
+    /**
+     * Train the NER classifier.
+     */
     private function trainNERClassifier(): void
     {
         // This is a placeholder. In a real implementation, you would load a pre-labeled dataset
@@ -245,6 +327,13 @@ class HybridRAG implements HybridRAGInterface
         $this->nerClassifier->train($samples, $labels);
     }
 
+    /**
+     * Convert predictions to entities.
+     *
+     * @param array $tokens The tokens
+     * @param array $predictions The predictions
+     * @return array The converted entities
+     */
     private function convertPredictionsToEntities(array $tokens, array $predictions): array
     {
         // This is a placeholder for converting predictions to entities
@@ -252,6 +341,12 @@ class HybridRAG implements HybridRAGInterface
         return [];
     }
 
+    /**
+     * Extract features from tokens.
+     *
+     * @param array $tokens The tokens to extract features from
+     * @return array The extracted features
+     */
     private function extractFeatures(array $tokens): array
     {
         // This is a placeholder for extracting features
@@ -259,24 +354,49 @@ class HybridRAG implements HybridRAGInterface
         return [];
     }
 
+    /**
+     * Set the vector weight.
+     *
+     * @param float $weight The weight to set
+     * @return self
+     */
     public function setVectorWeight(float $weight): self
     {
         $this->config->set('hybridrag.vector_weight', $weight);
         return $this;
     }
 
+    /**
+     * Set the top K value.
+     *
+     * @param int $topK The top K value to set
+     * @return self
+     */
     public function setTopK(int $topK): self
     {
         $this->config->set('hybridrag.top_k', $topK);
         return $this;
     }
 
+    /**
+     * Set the max depth.
+     *
+     * @param int $maxDepth The max depth to set
+     * @return self
+     */
     public function setMaxDepth(int $maxDepth): self
     {
         $this->config->set('hybridrag.max_depth', $maxDepth);
         return $this;
     }
 
+    /**
+     * Incorporate topics into the context.
+     *
+     * @param array $context The context array
+     * @param array $queryTopics The query topics
+     * @return array The updated context array
+     */
     private function incorporateTopics(array $context, array $queryTopics): array
     {
         foreach ($context as &$item) {
@@ -286,6 +406,13 @@ class HybridRAG implements HybridRAGInterface
         return $context;
     }
 
+    /**
+     * Incorporate sentiment into the context.
+     *
+     * @param array $context The context array
+     * @param float $querySentiment The query sentiment
+     * @return array The updated context array
+     */
     private function incorporateSentiment(array $context, float $querySentiment): array
     {
         foreach ($context as &$item) {
@@ -295,6 +422,13 @@ class HybridRAG implements HybridRAGInterface
         return $context;
     }
 
+    /**
+     * Calculate cosine similarity between two vectors.
+     *
+     * @param array $a The first vector
+     * @param array $b The second vector
+     * @return float The cosine similarity
+     */
     private function calculateCosineSimilarity(array $a, array $b): float
     {
         $dotProduct = 0;
@@ -313,28 +447,65 @@ class HybridRAG implements HybridRAGInterface
         return $dotProduct / ($magnitudeA * $magnitudeB);
     }
 
+    /**
+     * Improve the model using active learning.
+     *
+     * @param array $unlabeledSamples The unlabeled samples
+     * @param int $numSamples The number of samples to select
+     * @return array The selected samples
+     */
     public function improveModel(array $unlabeledSamples, int $numSamples): array
     {
         return $this->activeLearner->selectSamples($unlabeledSamples, $numSamples);
     }
 
+    /**
+     * Evaluate the performance of the system.
+     *
+     * @param string $query The query string
+     * @param string $answer The generated answer
+     * @param array $context The context used
+     * @param array $relevantContext The relevant context
+     * @return array The evaluation report
+     */
     public function evaluatePerformance(string $query, string $answer, array $context, array $relevantContext): array
     {
         return $this->evaluationMetrics->generateEvaluationReport($query, $answer, $context, $relevantContext);
     }
 
+    /**
+     * Add an image to the system.
+     *
+     * @param string $id The image ID
+     * @param string $filePath The file path of the image
+     * @param array $metadata Additional metadata
+     */
     public function addImage(string $id, string $filePath, array $metadata = []): void
     {
         $this->vectorRAG->addImage($id, $filePath, $metadata);
         $this->graphRAG->addImage($id, $filePath, $metadata);
     }
 
+    /**
+     * Add an audio file to the system.
+     *
+     * @param string $id The audio ID
+     * @param string $filePath The file path of the audio
+     * @param array $metadata Additional metadata
+     */
     public function addAudio(string $id, string $filePath, array $metadata = []): void
     {
         $this->vectorRAG->addAudio($id, $filePath, $metadata);
         $this->graphRAG->addAudio($id, $filePath, $metadata);
     }
 
+    /**
+     * Add a video file to the system.
+     *
+     * @param string $id The video ID
+     * @param string $filePath The file path of the video
+     * @param array $metadata Additional metadata
+     */
     public function addVideo(string $id, string $filePath, array $metadata = []): void
     {
         $this->vectorRAG->addVideo($id, $filePath, $metadata);

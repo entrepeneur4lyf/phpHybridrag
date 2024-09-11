@@ -14,6 +14,11 @@ use Monolog\Formatter\LineFormatter;
  *
  * This class provides a wrapper around Monolog for logging functionality.
  */
+/**
+ * Class Logger
+ *
+ * This class provides a wrapper around Monolog for logging functionality.
+ */
 class Logger
 {
     private MonologLogger $logger;

@@ -15,6 +15,11 @@ use Phpml\Metric\Accuracy;
  *
  * This class provides text classification functionality using Support Vector Classification (SVC).
  */
+/**
+ * Class TextClassifier
+ *
+ * This class provides text classification functionality using Support Vector Classification (SVC).
+ */
 class TextClassifier
 {
     private SVC $classifier;
