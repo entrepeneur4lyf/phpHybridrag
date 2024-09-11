@@ -56,46 +56,59 @@ class LexiconSentimentAnalyzer
     /**
      * Load the sentiment lexicon from a file.
      *
-     * @param array $lexicon The lexicon to set
-     * @return array The loaded lexicon as an associative array where keys are words and values are sentiment scores
-     */
-    private function setLexicon(array $lexicon): array
-    {
-        $defaultKeys = array_keys($this->lexicon);
-        $passedKeys = array_keys($lexicon);
-
-        // Check if all default keys are present in the passed lexicon
-        foreach ($defaultKeys as $key) {
-            if (!in_array($key, $passedKeys)) {
-                // Merge the passed lexicon with the default lexicon
-                $lexicon = array_merge($this->lexicon, $lexicon);
-                break;
-            }
-        }
-
-        // Validate the values in the passed lexicon
-        foreach ($lexicon as $word => $score) {
-            if (!is_string($word) || !is_float($score)) {
-                throw new \InvalidArgumentException("Invalid lexicon format. Each key must be a string and each value must be a float.");
-            }
-        }
-        return $lexicon;
-    }
-
-    /**
-     * Load the sentiment lexicon from a file.
-     *
      * @param string $path The path to the lexicon file
      * @return array The loaded lexicon as an associative array
      */
-    private function loadLexicon(string $path): array
+    private function loadLexicon(string $path): bool
     {
-        $lexicon = [];
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            list($word, $score) = explode("\t", $line);
-            $lexicon[$word] = (float) $score;
+        try {
+            $lexicon = [];
+            $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                list($word, $score) = explode("\t", $line);
+                $lexicon[$word] = (float) $score;
+            }
+
+            // Compare the keys of the loaded lexicon to the default keys
+            $defaultKeys = array_keys($this->lexicon);
+            $loadedKeys = array_keys($lexicon);
+            if (array_diff($defaultKeys, $loadedKeys) || array_diff($loadedKeys, $defaultKeys)) {
+                return false;
+            }
+
+            // Set the lexicon to the loaded lexicon
+            $this->lexicon = $lexicon;
+            return true;
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during file operations
+            return false;
         }
-        return $lexicon;
+    }
+
+    /**
+     * Set the sentiment lexicon.
+     *
+     * @param array $lexicon An associative array of words and their sentiment scores
+     * @return bool True if the lexicon was successfully set, false otherwise
+     */
+    public function setLexicon(array $lexicon): bool
+    {
+        try {
+            // Compare the keys of the provided lexicon to the default keys
+            $defaultKeys = array_keys($this->lexicon);
+            $providedKeys = array_keys($lexicon);
+
+            // Check if the provided keys are a subset of the default keys
+            if (array_diff($providedKeys, $defaultKeys)) {
+                return false;
+            }
+
+            // Merge the provided lexicon into the default lexicon
+            $this->lexicon = array_merge($this->lexicon, $lexicon);
+            return true;
+        } catch (\Exception $e) {
+            // Handle any exceptions that occur during the process
+            return false;
+        }
     }
 }

@@ -54,5 +54,5 @@ return [
         'path' => dirname(__FILE__) . '/logs/hybridrag.log',
         'level' => 'info',
         'debug_mode' => false,
-    ],
+    ]
 ];

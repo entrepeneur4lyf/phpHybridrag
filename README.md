@@ -1,6 +1,6 @@
 # HybridRAG
 
-HybridRAG is a PHP library that implements a Hybrid Retrieval-Augmented Generation system, combining vector-based and graph-based approaches for improved information retrieval and answer generation.
+HybridRAG is a PHP library that implements a Hybrid Retrieval-Augmented Generation system (https://arxiv.org/abs/2408.04948), combining vector-based and graph-based approaches for improved information retrieval and answer generation.
 
 ## Table of Contents
 
@@ -113,12 +113,11 @@ return [
         'path' => dirname(__FILE__) . '/logs/hybridrag.log',
         'level' => 'info',
         'debug_mode' => false,
-    ],
-    // Other configuration options...
+    ]
 ];
 ```
 
-You can customize these values or use environment variables for sensitive information.
+##RECOMMENDED: use environment variables for sensitive information such as api keys and passwords.
 
 ## Usage
 
@@ -130,8 +129,8 @@ Here's a basic example of how to use HybridRAG:
 use HybridRAG\HybridRAG\HybridRAGFactory;
 use HybridRAG\Config\Configuration;
 
-// Load configuration
-$config = new Configuration('path/to/your/config.yaml');
+// Load configuration or edit the default config in config/config.php
+$config = new Configuration('path/to/your/config.php');
 
 // Create HybridRAG instance
 $hybridRAG = HybridRAGFactory::create($config);
