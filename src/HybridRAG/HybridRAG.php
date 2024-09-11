@@ -76,11 +76,7 @@ class HybridRAG implements HybridRAGInterface
         try {
             $this->nerClassifier = new NERClassifier();
             $this->topicModeler = new LDATopicModeler();
-            $lexiconPath = $this->config->sentiment_analysis['lexicon_path'];
-            if ($lexiconPath === null) {
-                throw new HybridRAGException('Lexicon path for sentiment analysis is not configured.');
-            }
-            $this->sentimentAnalyzer = new LexiconSentimentAnalyzer($lexiconPath);
+            $this->sentimentAnalyzer = new LexiconSentimentAnalyzer();
             $this->activeLearner = new UncertaintySampler($this->nerClassifier);
             $this->evaluationMetrics = new EvaluationMetrics($this->languageModel);
             $this->trainNERClassifier();
@@ -316,20 +312,29 @@ class HybridRAG implements HybridRAGInterface
 
     /**
      * Train the NER classifier.
+     *
+     * @param string|null $datasetPath The path to the custom dataset file, or null to use the default dataset
+     * @throws HybridRAGException If the dataset file is not found or cannot be loaded
      */
-    private function trainNERClassifier(): void
+    private function trainNERClassifier(?string $datasetPath = null): void
     {
-        // This is a placeholder. In a real implementation, you would load a pre-labeled dataset
-        $samples = [
-            'John is from New York',
-            'Apple Inc. was founded by Steve Jobs',
-            'The Eiffel Tower is in Paris'
-        ];
-        $labels = [
-            ['ENTITY', 'O', 'O', 'ENTITY', 'ENTITY'],
-            ['ENTITY', 'ENTITY', 'O', 'O', 'O', 'ENTITY', 'ENTITY'],
-            ['O', 'ENTITY', 'ENTITY', 'O', 'O', 'ENTITY']
-        ];
+        // Use a default dataset if no custom dataset is provided
+        if ($datasetPath === null) {
+            $datasetPath = __DIR__ . '/../../config/dataset/default_classifier_dataset.json'; // Adjust the path as needed
+        }
+
+        if (!file_exists($datasetPath)) {
+            throw new HybridRAGException("Dataset file not found: {$datasetPath}");
+        }
+
+        $data = json_decode(file_get_contents($datasetPath), true);
+        if ($data === null || !isset($data['samples']) || !isset($data['labels'])) {
+            throw new HybridRAGException("Invalid dataset format in file: {$datasetPath}");
+        }
+
+        $samples = $data['samples'];
+        $labels = $data['labels'];
+
         $this->nerClassifier->train($samples, $labels);
     }
 
@@ -341,7 +346,7 @@ class HybridRAG implements HybridRAGInterface
      */
     public function setVectorWeight(float $weight): self
     {
-        $this->config->set('hybridrag.vector_weight', $weight);
+        $this->config->hybridrag['vector_weight'] = $weight;
         return $this;
     }
 

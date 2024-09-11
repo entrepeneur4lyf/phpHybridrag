@@ -6,7 +6,7 @@ namespace HybridRAG\VectorDatabase;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-
+use HybridRAG\Config\Configuration;
 /**
  * Class ChromaDBConnector
  *
@@ -20,19 +20,15 @@ class ChromaDBConnector implements VectorDatabaseInterface
     /**
      * ChromaDBConnector constructor.
      *
-     * @param string $host The host of the ChromaDB server
-     * @param int $port The port of the ChromaDB server
-     * @param string $collection The name of the collection to use (default: 'default_collection')
+     * @param Configuration $config The configuration object
      */
     public function __construct(
-        private string $host,
-        private int $port,
-        private string $collection = 'default_collection'
+        private Configuration $config
     ) {
         $this->client = new Client([
-            'base_uri' => "http://{$this->host}:{$this->port}",
+            'base_uri' => "http://{$this->config->chromadb['host']}:{$this->config->chromadb['port']}",
         ]);
-        $this->collectionName = $collection;
+        $this->collectionName = $this->config->chromadb['collection'];
         $this->createCollectionIfNotExists();
     }
 

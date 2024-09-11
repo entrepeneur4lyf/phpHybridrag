@@ -32,7 +32,7 @@ class VectorRAGFactory
         LanguageModelInterface $languageModel,
         Logger $logger
     ): VectorRAG {
-        $vectorDB = new ChromaDBAdapter($config->get('chromadb'), $logger);
+        $vectorDB = new ChromaDBAdapter($config->chromadb, $logger);
         return new VectorRAG($vectorDB, $embedding, $languageModel, $logger);
     }
 }

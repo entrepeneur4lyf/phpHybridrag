@@ -19,17 +19,18 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
 {
     private Logger $logger;
     private OpenAI\Client $openai;
-
+    private Configuration $config;
     /**
      * AudioPreprocessor constructor.
      *
      * @param Logger $logger The logger instance
-     * @param string $openaiApiKey The OpenAI API key
+     * @param Configuration $config The configuration instance
      */
-    public function __construct(Logger $logger, string $openaiApiKey)
+    public function __construct(Logger $logger, Configuration $config)
     {
         $this->logger = $logger;
-        $this->openai = OpenAI::client($openaiApiKey);
+        $this->config = $config;
+        $this->openai = OpenAI::client($this->config->openai['api_key']);
     }
 
     /**
@@ -39,7 +40,7 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
      * @return string The parsed text from the audio
      * @throws HybridRAGException If parsing fails
      */
-    public function parseDocument(string $filePath): string
+    public function parseDocument(string $filePath): array
     {
         try {
             $this->logger->info("Parsing audio", ['filePath' => $filePath]);
@@ -48,10 +49,34 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
             $mp3Path = $this->convertToMp3($filePath);
             
             // Perform speech-to-text using Whisper
-            $text = $this->performSpeechToText($mp3Path);
+            $result = $this->performSpeechToText($mp3Path);
+            
+            // Extract the transcribed text and segments
+            $text = $result['text'] ?? '';
+            $segments = $result['segments'] ?? [];
+            $words = $result['words'] ?? [];
+            
+            // Prepare structured output for graphing and vectorization
+            $structuredOutput = [
+                'text' => $text,
+                'segments' => array_map(function($segment) {
+                    return [
+                        'start' => $segment['start'],
+                        'end' => $segment['end'],
+                        'text' => $segment['text'],
+                    ];
+                }, $segments),
+                'words' => array_map(function($word) {
+                    return [
+                        'word' => $word['word'],
+                        'start' => $word['start'],
+                        'end' => $word['end'],
+                    ];
+                }, $words),
+            ];
             
             $this->logger->info("Audio parsed successfully", ['filePath' => $filePath]);
-            return $text;
+            return $structuredOutput; // Return structured output
         } catch (\Exception $e) {
             $this->logger->error("Failed to parse audio", ['filePath' => $filePath, 'error' => $e->getMessage()]);
             throw new HybridRAGException("Failed to parse audio: " . $e->getMessage(), 0, $e);
@@ -143,16 +168,18 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
      * Perform speech-to-text conversion using OpenAI's Whisper model.
      *
      * @param string $audioPath The path to the audio file
-     * @return string The transcribed text
+     * @return array The transcribed text and timestam
      */
-    private function performSpeechToText(string $audioPath): string
+    private function performSpeechToText(string $audioPath): array
     {
         $response = $this->openai->audio()->transcribe([
             'model' => 'whisper-1',
+            'temperature' => 0.2,
             'file' => fopen($audioPath, 'r'),
-            'response_format' => 'text',
+            'response_format' => 'verbose_json',
+            'timestamp_granularities' => ['segment', 'word']
         ]);
-
-        return $response->text;
+        
+        return json_decode($response, true); // Decode the response to an associative array
     }
 }

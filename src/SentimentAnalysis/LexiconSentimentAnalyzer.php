@@ -56,6 +56,35 @@ class LexiconSentimentAnalyzer
     /**
      * Load the sentiment lexicon from a file.
      *
+     * @param array $lexicon The lexicon to set
+     * @return array The loaded lexicon as an associative array where keys are words and values are sentiment scores
+     */
+    private function setLexicon(array $lexicon): array
+    {
+        $defaultKeys = array_keys($this->lexicon);
+        $passedKeys = array_keys($lexicon);
+
+        // Check if all default keys are present in the passed lexicon
+        foreach ($defaultKeys as $key) {
+            if (!in_array($key, $passedKeys)) {
+                // Merge the passed lexicon with the default lexicon
+                $lexicon = array_merge($this->lexicon, $lexicon);
+                break;
+            }
+        }
+
+        // Validate the values in the passed lexicon
+        foreach ($lexicon as $word => $score) {
+            if (!is_string($word) || !is_float($score)) {
+                throw new \InvalidArgumentException("Invalid lexicon format. Each key must be a string and each value must be a float.");
+            }
+        }
+        return $lexicon;
+    }
+
+    /**
+     * Load the sentiment lexicon from a file.
+     *
      * @param string $path The path to the lexicon file
      * @return array The loaded lexicon as an associative array
      */

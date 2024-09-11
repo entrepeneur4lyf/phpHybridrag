@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
-
+use HybridRAG\Configuration;
 /**
  * Class OpenAILanguageModel
  *
@@ -16,24 +16,29 @@ use HybridRAG\Logging\Logger;
  */
 class OpenAILanguageModel implements LanguageModelInterface
 {
+    private Configuration $config;
     private Client $client;
 
     /**
      * OpenAILanguageModel constructor.
      *
-     * @param string $apiKey The OpenAI API key
-     * @param string $model The model to use (default: 'gpt-3.5-turbo')
+     * @param Configuration $config The configuration instance
      * @param Logger $logger The logger instance
      */
     public function __construct(
-        private string $apiKey,
-        private string $model = 'gpt-3.5-turbo',
+        Configuration $config,
         private Logger $logger
     ) {
         $this->client = new Client([
-            'base_uri' => 'https://api.openai.com/v1/',
+            'base_uri' => $this->config->openai['api_base_url'],
+            'model' => $this->config->openai['language_model'],
+            'temperature' => $this->config->openai['language_model']['temperature'],
+            'max_tokens' => $this->config->openai['language_model']['max_tokens'],
+            'top_p' => $this->config->openai['language_model']['top_p'],
+            'frequency_penalty' => $this->config->openai['language_model']['frequency_penalty'],
+            'presence_penalty' => $this->config->openai['language_model']['presence_penalty'],
             'headers' => [
-                'Authorization' => "Bearer {$this->apiKey}",
+                'Authorization' => "Bearer {$this->config->openai['api_key']}",
                 'Content-Type' => 'application/json',
             ],
         ]);
@@ -50,18 +55,18 @@ class OpenAILanguageModel implements LanguageModelInterface
     public function generateResponse(string $prompt, array $context): string
     {
         try {
-            $this->logger->info("Generating response from OpenAI", ['model' => $this->model]);
+            $this->logger->info("Generating response from OpenAI", ['model' => $this->config->openai['language_model']['model']]);
             $messages = $this->formatMessages($prompt, $context);
 
             $response = $this->client->post('chat/completions', [
                 'json' => [
-                    'model' => $this->model,
+                    'model' => $this->config->openai['language_model']['model'],
                     'messages' => $messages,
-                    'temperature' => 0.7,
-                    'max_tokens' => 150,
-                    'top_p' => 1,
-                    'frequency_penalty' => 0,
-                    'presence_penalty' => 0,
+                    'temperature' => $this->config->openai['language_model']['temperature'],
+                    'max_tokens' => $this->config->openai['language_model']['max_tokens'],
+                    'top_p' => $this->config->openai['language_model']['top_p'],
+                    'frequency_penalty' => $this->config->openai['language_model']['frequency_penalty'],
+                    'presence_penalty' => $this->config->openai['language_model']['presence_penalty'],
                 ],
             ]);
 
@@ -85,7 +90,7 @@ class OpenAILanguageModel implements LanguageModelInterface
     private function formatMessages(string $prompt, array $context): array
     {
         return [
-            ['role' => 'system', 'content' => 'You are a helpful assistant. Use the provided context to answer the user\'s question.'],
+            ['role' => 'system', 'content' => 'You are an image description assistant. Analyze the provided image and describe its content in detail, including objects, people, actions, colors, and any relevant context.'],
             ['role' => 'user', 'content' => "Context:\n" . json_encode($context)],
             ['role' => 'user', 'content' => "Question: $prompt"]
         ];

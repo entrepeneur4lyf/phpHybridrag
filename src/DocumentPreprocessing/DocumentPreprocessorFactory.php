@@ -29,12 +29,12 @@ class DocumentPreprocessorFactory
             case 'pdf':
                 return new PDFPreprocessor($logger);
             case 'image':
-                return new ImagePreprocessor($logger, $config->get('openai.api_key'));
+                return new ImagePreprocessor($logger, $config->openai['api_key']);
             case 'audio':
-                return new AudioPreprocessor($logger, $config->get('openai.api_key'));
+                return new AudioPreprocessor($logger, $config->openai['api_key']);
             case 'video':
-                $audioPreprocessor = new AudioPreprocessor($logger, $config->get('openai.api_key'));
-                $imagePreprocessor = new ImagePreprocessor($logger, $config->get('openai.api_key'));
+                $audioPreprocessor = new AudioPreprocessor($logger, $config->openai['api_key']);
+                $imagePreprocessor = new ImagePreprocessor($logger, $config->openai['api_key']);
                 return new VideoPreprocessor($logger, $audioPreprocessor, $imagePreprocessor);
             default:
                 throw new \InvalidArgumentException("Unsupported file type: $fileType");

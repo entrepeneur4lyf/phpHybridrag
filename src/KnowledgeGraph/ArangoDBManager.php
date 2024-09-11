@@ -30,23 +30,29 @@ class ArangoDBManager extends AbstractGraphDatabase
 
     /**
      * Initialize the connection to ArangoDB.
+     *
+     * @throws HybridRAGException If the connection to ArangoDB fails
      */
     protected function initializeConnection(): void
     {
-        $connectionOptions = [
-            ConnectionOptions::OPTION_ENDPOINT => "tcp://{$this->config['host']}:{$this->config['port']}",
-            ConnectionOptions::OPTION_AUTH_TYPE => 'Basic',
-            ConnectionOptions::OPTION_AUTH_USER => $this->config['username'],
-            ConnectionOptions::OPTION_AUTH_PASSWD => $this->config['password'],
-            ConnectionOptions::OPTION_DATABASE => $this->config['database'],
-        ];
+        try {
+            $connectionOptions = [
+                ConnectionOptions::OPTION_ENDPOINT => "tcp://{$this->config['arangodb']['host']}:{$this->config['arangodb']['port']}",
+                ConnectionOptions::OPTION_AUTH_TYPE => 'Basic',
+                ConnectionOptions::OPTION_AUTH_USER => $this->config['arangodb']['username'],
+                ConnectionOptions::OPTION_AUTH_PASSWD => $this->config['arangodb']['password'],
+                ConnectionOptions::OPTION_DATABASE => $this->config['arangodb']['database'],
+            ];
 
-        $this->connection = new Connection($connectionOptions);
-        $this->documentHandler = new DocumentHandler($this->connection);
-        $this->edgeHandler = new EdgeHandler($this->connection);
-        $this->graphHandler = new GraphHandler($this->connection);
-        $this->collectionHandler = new CollectionHandler($this->connection);
-        $this->indexHandler = new IndexHandler($this->connection);
+            $this->connection = new Connection($connectionOptions);
+            $this->documentHandler = new DocumentHandler($this->connection);
+            $this->edgeHandler = new EdgeHandler($this->connection);
+            $this->graphHandler = new GraphHandler($this->connection);
+            $this->collectionHandler = new CollectionHandler($this->connection);
+            $this->indexHandler = new IndexHandler($this->connection);
+        } catch (\Exception $e) {
+            throw new HybridRAGException("Failed to initialize connection to ArangoDB: " . $e->getMessage(), 0, $e);
+        }
     }
 
     /**

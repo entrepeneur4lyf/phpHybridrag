@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HybridRAG\KnowledgeGraph;
 
+use HybridRAG\Configuration;
+
 /**
  * Abstract class AbstractGraphDatabase
  *
@@ -12,16 +14,16 @@ namespace HybridRAG\KnowledgeGraph;
 abstract class AbstractGraphDatabase implements GraphDatabaseInterface
 {
     /**
-     * @var array The configuration for the graph database
+     * @var Configuration The configuration for the graph database
      */
-    protected array $config;
+    protected Configuration $config;
 
     /**
      * Connect to the graph database.
      *
-     * @param array $config Configuration parameters for the connection
+     * @param Configuration $config Configuration parameters for the connection
      */
-    public function connect(array $config): void
+    public function connect(Configuration $config): void
     {
         $this->config = $config;
         $this->initializeConnection();

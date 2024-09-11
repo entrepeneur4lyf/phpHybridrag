@@ -8,7 +8,7 @@ use CodeWithKyrian\ChromaDB\ChromaDB;
 use CodeWithKyrian\ChromaDB\Collection;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
-
+use HybridRAG\Config\Configuration;
 /**
  * Class ChromaDBAdapter
  *
@@ -23,17 +23,17 @@ class ChromaDBAdapter implements VectorDatabaseInterface
     /**
      * ChromaDBAdapter constructor.
      *
-     * @param array $config The configuration array for ChromaDB
+     * @param Configuration $config The configuration object
      * @param Logger $logger The logger instance
      * @throws HybridRAGException If connection to ChromaDB fails
      */
-    public function __construct(array $config, Logger $logger)
+    public function __construct(Configuration $config, Logger $logger)
     {
         $this->logger = $logger;
         try {
-            $this->client = new ChromaDB($config['host'], $config['port']);
-            $this->collection = $this->client->getOrCreateCollection($config['collection']);
-            $this->logger->info("ChromaDB connection established", ['collection' => $config['collection']]);
+            $this->client = new ChromaDB($config->chromadb['host'], $config->chromadb['port']);
+            $this->collection = $this->client->getOrCreateCollection($config->chromadb['collection']);
+            $this->logger->info("ChromaDB connection established", ['collection' => $config->chromadb['collection']]);
         } catch (\Exception $e) {
             $this->logger->error("Failed to connect to ChromaDB", ['error' => $e->getMessage()]);
             throw new HybridRAGException("Failed to connect to ChromaDB: " . $e->getMessage(), 0, $e);

@@ -15,11 +15,11 @@ class GraphDatabaseFactory
      * Create a graph database instance based on the given type and configuration.
      *
      * @param string $type The type of graph database to create
-     * @param array $config The configuration for the database
+     * @param Configuration $config The configuration for the database
      * @return GraphDatabaseInterface The created graph database instance
      * @throws \InvalidArgumentException If an unsupported database type is provided
      */
-    public static function create(string $type, array $config): GraphDatabaseInterface
+    public static function create(string $type, Configuration $config): GraphDatabaseInterface
     {
         switch ($type) {
             case 'arangodb':

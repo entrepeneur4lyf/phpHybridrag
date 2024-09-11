@@ -16,18 +16,20 @@ use OpenAI;
 class ImagePreprocessor implements DocumentPreprocessorInterface
 {
     private Logger $logger;
+    private Configuration $config;
     private OpenAI\Client $openai;
 
     /**
      * ImagePreprocessor constructor.
      *
      * @param Logger $logger The logger instance
-     * @param string $openaiApiKey The OpenAI API key
+     * @param Configuration $config The configuration instance
      */
-    public function __construct(Logger $logger, string $openaiApiKey)
+    public function __construct(Logger $logger, Configuration $config)
     {
         $this->logger = $logger;
-        $this->openai = OpenAI::client($openaiApiKey);
+        $this->config = $config;
+        $this->openai = OpenAI::client($this->config->openai['api_key']);
     }
 
     /**

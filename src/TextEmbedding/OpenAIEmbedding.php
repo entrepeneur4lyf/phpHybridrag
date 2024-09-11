@@ -7,16 +7,23 @@ namespace HybridRAG\TextEmbedding;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\SimpleCache\CacheInterface;
+use Phpml\FeatureExtraction\TfIdfTransformer;
+use Phpml\Tokenization\WordTokenizer;
+use Phpml\FeatureExtraction\StopWords\English;
 
 /**
  * Class OpenAIEmbedding
  *
- * This class implements the EmbeddingInterface using Open AI's text embedding API.
+ * This class implements the EmbeddingInterface using Open AI's text embedding API
+ * with enhanced text preprocessing.
  */
 class OpenAIEmbedding implements EmbeddingInterface
 {
     private Client $client;
     private CacheInterface $cache;
+    private TfIdfTransformer $tfidfTransformer;
+    private WordTokenizer $tokenizer;
+    private English $stopWords;
 
     /**
      * OpenAIEmbedding constructor.
@@ -40,10 +47,13 @@ class OpenAIEmbedding implements EmbeddingInterface
             ],
         ]);
         $this->cache = $cache ?? new ArrayCache();
+        $this->tfidfTransformer = new TfIdfTransformer();
+        $this->tokenizer = new WordTokenizer();
+        $this->stopWords = new English();
     }
 
     /**
-     * Embed a single text into a vector representation.
+     * Embed a single text into a vector representation with enhanced preprocessing.
      *
      * @param string $text The text to embed
      * @return array The vector representation of the text
@@ -55,14 +65,15 @@ class OpenAIEmbedding implements EmbeddingInterface
             return $this->cache->get($cacheKey);
         }
 
-        $embedding = $this->callOpenAIAPI([$text])[0];
+        $enhancedText = $this->enhanceText($text);
+        $embedding = $this->callOpenAIAPI([$enhancedText])[0];
         $this->cache->set($cacheKey, $embedding, $this->cacheTtl);
 
         return $embedding;
     }
 
     /**
-     * Embed multiple texts into vector representations.
+     * Embed multiple texts into vector representations with enhanced preprocessing.
      *
      * @param array $texts An array of texts to embed
      * @return array An array of vector representations for the input texts
@@ -77,7 +88,7 @@ class OpenAIEmbedding implements EmbeddingInterface
             if ($this->cache->has($cacheKey)) {
                 $embeddings[$index] = $this->cache->get($cacheKey);
             } else {
-                $uncachedTexts[$index] = $text;
+                $uncachedTexts[$index] = $this->enhanceText($text);
             }
         }
 
@@ -86,12 +97,38 @@ class OpenAIEmbedding implements EmbeddingInterface
             foreach ($uncachedTexts as $index => $text) {
                 $embedding = $newEmbeddings[array_search($text, $uncachedTexts)];
                 $embeddings[$index] = $embedding;
-                $this->cache->set($this->getCacheKey($text), $embedding, $this->cacheTtl);
+                $this->cache->set($this->getCacheKey($texts[$index]), $embedding, $this->cacheTtl);
             }
         }
 
         ksort($embeddings);
         return $embeddings;
+    }
+
+    /**
+     * Enhance the input text by preprocessing and applying TF-IDF transformation.
+     *
+     * @param string $text The input text to enhance
+     * @return string The enhanced text
+     */
+    private function enhanceText(string $text): string
+    {
+        $tokens = $this->preprocess($text);
+        $tfidf = $this->tfidfTransformer->transform([$tokens]);
+        return implode(' ', array_keys(array_filter($tfidf[0])));
+    }
+
+    /**
+     * Preprocess the input text by tokenizing, converting to lowercase,
+     * and removing stop words.
+     *
+     * @param string $text The input text to preprocess
+     * @return array The preprocessed tokens
+     */
+    private function preprocess(string $text): array
+    {
+        $tokens = $this->tokenizer->tokenize(strtolower($text));
+        return array_filter($tokens, fn($token) => !$this->stopWords->isStopWord($token));
     }
 
     /**

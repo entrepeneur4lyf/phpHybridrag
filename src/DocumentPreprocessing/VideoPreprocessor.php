@@ -44,19 +44,37 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
      * @return string The extracted content from the video
      * @throws HybridRAGException If parsing fails
      */
-    public function parseDocument(string $filePath): string
+    public function parseDocument(string $filePath): array
     {
         try {
             $this->logger->info("Parsing video", ['filePath' => $filePath]);
             
             $audioPath = $this->extractAudio($filePath);
-            $audioText = $this->audioPreprocessor->parseDocument($audioPath);
+            $audioResult = $this->audioPreprocessor->parseDocument($audioPath); // Get structured output
+            
+            $audioText = $audioResult['text']; // Extract the transcribed text
+            $audioSegments = $audioResult['segments']; // Extract the segments
+            $audioWords = $audioResult['words']; // Extract the words
             
             $keyFrames = $this->extractKeyFrames($filePath);
             $frameTexts = [];
-            foreach ($keyFrames as $frame) {
+            foreach ($keyFrames as $index => $frame) {
                 $frameTexts[] = $this->imagePreprocessor->parseDocument($frame);
                 unlink($frame); // Clean up temporary frame file
+            }
+            
+            // Associate keyframes with audio segments
+            $keyframeAssociations = [];
+            foreach ($audioSegments as $segment) {
+                $start = $segment['start'];
+                $end = $segment['end'];
+                $keyframeAssociations[] = [
+                    'segment' => $segment,
+                    'keyframes' => array_filter($keyFrames, function($keyFrame) use ($start, $end) {
+                        // Use the timestamp from the keyframe
+                        return $keyFrame['timestamp'] >= $start && $keyFrame['timestamp'] <= $end;
+                    })
+                ];
             }
             
             $text = $audioText . "\n" . implode("\n", $frameTexts);
@@ -64,7 +82,12 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
             unlink($audioPath); // Clean up temporary audio file
             
             $this->logger->info("Video parsed successfully", ['filePath' => $filePath]);
-            return $text;
+            return [
+                'text' => $text,
+                'audio_segments' => $audioSegments, // Include audio segments in the return
+                'audio_words' => $audioWords, // Include audio words in the return
+                'keyframe_associations' => $keyframeAssociations // Include keyframe associations
+            ];
         } catch (\Exception $e) {
             $this->logger->error("Failed to parse video", ['filePath' => $filePath, 'error' => $e->getMessage()]);
             throw new HybridRAGException("Failed to parse video: " . $e->getMessage(), 0, $e);
@@ -169,13 +192,17 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         
         $keyFrames = [];
         for ($i = 1; $i <= $frameCount; $i++) {
-            $time = $interval * $i;
+            $time = $interval * $i; // This is the timestamp for the keyframe
             $framePath = sys_get_temp_dir() . '/' . uniqid() . '.jpg';
             
             $video->filters()->synchronize();
             $video->frame(TimeCode::fromSeconds($time))->save($framePath);
             
-            $keyFrames[] = $framePath;
+            // Store both the frame path and its timestamp
+            $keyFrames[] = [
+                'path' => $framePath,
+                'timestamp' => $time // Store the timestamp of the keyframe
+            ];
         }
         
         return $keyFrames;

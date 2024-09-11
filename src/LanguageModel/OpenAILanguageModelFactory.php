@@ -25,8 +25,6 @@ class OpenAILanguageModelFactory
         Configuration $config,
         Logger $logger
     ): OpenAILanguageModel {
-        $apiKey = $config->get('openai.api_key');
-        $model = $config->get('openai.language_model');
-        return new OpenAILanguageModel($apiKey, $model, $logger);
+        return new OpenAILanguageModel($config->openai['api_key'], $config->openai['language_model']['model'], $logger);
     }
 }
