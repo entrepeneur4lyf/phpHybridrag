@@ -67,25 +67,24 @@ class Configuration
     /**
      * Get a configuration value by key.
      *
-     * @param string $key The configuration key (dot notation supported)
+     * @param string $key The configuration key
      * @param mixed $default The default value if the key is not found
      * @return mixed The configuration value
      */
     public function get(string $key, $default = null)
     {
-        return $this->getNestedValue($this->config, explode('.', $key), $default);
+        return $this->config[$key] ?? $default;
     }
 
     /**
      * Set a configuration value.
      *
-     * @param string $key The configuration key (dot notation supported)
+     * @param string $key The configuration key
      * @param mixed $value The value to set
      */
     public function set(string $key, $value): void
     {
-        $keys = explode('.', $key);
-        $this->setNestedValue($this->config, $keys, $value);
+        $this->config[$key] = $value;
     }
 
     /**
