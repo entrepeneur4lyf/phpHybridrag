@@ -18,6 +18,8 @@ class IsolationForestDetector
     private int $numTrees;
     private Normalizer $normalizer;
     private Euclidean $distance;
+    private array $data;
+    private array $trees;
 
     /**
      * IsolationForestDetector constructor.

@@ -58,6 +58,14 @@ class GraphRAG implements GraphRAGInterface
         }
     }
 
+    /**
+     * Retrieve context for a given query from the knowledge graph.
+     *
+     * @param string $query The query string
+     * @param int|null $maxDepth The maximum depth to traverse in the graph (optional)
+     * @return array An array of relevant context from the graph
+     * @throws HybridRAGException If retrieving context fails
+     */
     public function retrieveContext(string $query, int $maxDepth = null): array
     {
         try {
@@ -79,6 +87,14 @@ class GraphRAG implements GraphRAGInterface
         }
     }
 
+    /**
+     * Generate an answer based on the query and provided context from the graph.
+     *
+     * @param string $query The query string
+     * @param array $context The context retrieved from the graph
+     * @return string The generated answer
+     * @throws HybridRAGException If generating the answer fails
+     */
     public function generateAnswer(string $query, array $context): string
     {
         try {
@@ -94,6 +110,12 @@ class GraphRAG implements GraphRAGInterface
         }
     }
 
+    /**
+     * Disambiguate entities from the query.
+     *
+     * @param string $query The query string
+     * @return array An array of disambiguated entities
+     */
     private function disambiguateEntities(string $query): array
     {
         $queryEmbedding = $this->embedding->embed($query);
@@ -114,6 +136,12 @@ class GraphRAG implements GraphRAGInterface
         return $this->kg->query($aql, $bindVars);
     }
 
+    /**
+     * Format the subgraph into a standardized structure.
+     *
+     * @param array $subgraph The subgraph to format
+     * @return array The formatted subgraph
+     */
     private function formatSubgraph(array $subgraph): array
     {
         $formattedContext = [];
@@ -139,6 +167,12 @@ class GraphRAG implements GraphRAGInterface
         return $formattedContext;
     }
 
+    /**
+     * Format the context for the language model.
+     *
+     * @param array $context The context to format
+     * @return string The formatted context as a string
+     */
     private function formatContextForLLM(array $context): string
     {
         $formattedContext = "";
@@ -154,6 +188,13 @@ class GraphRAG implements GraphRAGInterface
         return $formattedContext;
     }
 
+    /**
+     * Construct a prompt for the language model.
+     *
+     * @param string $query The query string
+     * @param string $context The formatted context
+     * @return string The constructed prompt
+     */
     private function constructPrompt(string $query, string $context): string
     {
         return <<<EOT
@@ -168,12 +209,24 @@ class GraphRAG implements GraphRAGInterface
         EOT;
     }
 
+    /**
+     * Set the maximum depth for graph traversal.
+     *
+     * @param int $maxDepth The maximum depth to set
+     * @return self
+     */
     public function setMaxDepth(int $maxDepth): self
     {
         $this->maxDepth = $maxDepth;
         return $this;
     }
 
+    /**
+     * Set the entity similarity threshold.
+     *
+     * @param float $threshold The threshold to set
+     * @return self
+     */
     public function setEntitySimilarityThreshold(float $threshold): self
     {
         $this->entitySimilarityThreshold = $threshold;

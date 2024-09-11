@@ -9,10 +9,22 @@ use GuzzleHttp\Exception\GuzzleException;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
 
+/**
+ * Class OpenAILanguageModel
+ *
+ * This class implements the LanguageModelInterface using the OpenAI API.
+ */
 class OpenAILanguageModel implements LanguageModelInterface
 {
     private Client $client;
 
+    /**
+     * OpenAILanguageModel constructor.
+     *
+     * @param string $apiKey The OpenAI API key
+     * @param string $model The model to use (default: 'gpt-3.5-turbo')
+     * @param Logger $logger The logger instance
+     */
     public function __construct(
         private string $apiKey,
         private string $model = 'gpt-3.5-turbo',
@@ -27,6 +39,14 @@ class OpenAILanguageModel implements LanguageModelInterface
         ]);
     }
 
+    /**
+     * Generate a response based on the given prompt and context.
+     *
+     * @param string $prompt The input prompt
+     * @param array $context Additional context for the generation
+     * @return string The generated response
+     * @throws HybridRAGException If the API request fails
+     */
     public function generateResponse(string $prompt, array $context): string
     {
         try {
@@ -55,6 +75,13 @@ class OpenAILanguageModel implements LanguageModelInterface
         }
     }
 
+    /**
+     * Format the messages for the OpenAI API request.
+     *
+     * @param string $prompt The input prompt
+     * @param array $context Additional context for the generation
+     * @return array The formatted messages
+     */
     private function formatMessages(string $prompt, array $context): array
     {
         return [

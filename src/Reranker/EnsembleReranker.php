@@ -7,17 +7,35 @@ namespace HybridRAG\Reranker;
 use Phpml\Ensemble\RandomForest;
 use Phpml\Classification\DecisionTree;
 
+/**
+ * Class EnsembleReranker
+ *
+ * This class implements an ensemble reranking approach using multiple rerankers and a Random Forest model.
+ */
 class EnsembleReranker implements RerankerInterface
 {
     private array $rerankers;
     private RandomForest $ensemble;
 
+    /**
+     * EnsembleReranker constructor.
+     *
+     * @param array $rerankers An array of reranker instances
+     */
     public function __construct(array $rerankers)
     {
         $this->rerankers = $rerankers;
         $this->ensemble = new RandomForest();
     }
 
+    /**
+     * Rerank the given results using the ensemble of rerankers and a Random Forest model.
+     *
+     * @param string $query The query string
+     * @param array $results The initial results to rerank
+     * @param int $topK The number of top results to return
+     * @return array The reranked results
+     */
     public function rerank(string $query, array $results, int $topK): array
     {
         $features = [];

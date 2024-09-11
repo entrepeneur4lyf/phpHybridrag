@@ -12,6 +12,11 @@ use Psr\SimpleCache\CacheInterface;
 use Phpml\Tokenization\WordTokenizer;
 use Phpml\FeatureExtraction\StopWords\English;
 
+/**
+ * Class HybridReranker
+ *
+ * This class implements a hybrid reranking approach combining BM25 and semantic similarity.
+ */
 class HybridReranker implements RerankerInterface
 {
     private const CACHE_TTL = 3600; // 1 hour
@@ -20,6 +25,16 @@ class HybridReranker implements RerankerInterface
     private WordTokenizer $tokenizer;
     private English $stopWords;
 
+    /**
+     * HybridReranker constructor.
+     *
+     * @param EmbeddingInterface $embedding The embedding interface
+     * @param VectorDatabaseInterface $vectorDB The vector database interface
+     * @param CacheInterface $cache The cache interface
+     * @param Logger $logger The logger instance
+     * @param float $bm25Weight The weight for BM25 scoring (default: 0.5)
+     * @param float $semanticWeight The weight for semantic scoring (default: 0.5)
+     */
     public function __construct(
         private EmbeddingInterface $embedding,
         private VectorDatabaseInterface $vectorDB,
@@ -33,6 +48,15 @@ class HybridReranker implements RerankerInterface
         $this->stopWords = new English();
     }
 
+    /**
+     * Rerank the given results based on the query.
+     *
+     * @param string $query The query string
+     * @param array $results The initial results to rerank
+     * @param int $topK The number of top results to return
+     * @return array The reranked results
+     * @throws HybridRAGException If reranking fails
+     */
     public function rerank(string $query, array $results, int $topK): array
     {
         try {
@@ -68,6 +92,11 @@ class HybridReranker implements RerankerInterface
         }
     }
 
+    /**
+     * Calculate corpus statistics for BM25 scoring.
+     *
+     * @throws HybridRAGException If calculation fails
+     */
     private function calculateCorpusStatistics(): void
     {
         try {
@@ -117,6 +146,13 @@ class HybridReranker implements RerankerInterface
         }
     }
 
+    /**
+     * Calculate BM25 score for a document given query terms.
+     *
+     * @param array $queryTerms The tokenized query terms
+     * @param string $document The document content
+     * @return float The BM25 score
+     */
     private function calculateBM25Score(array $queryTerms, string $document): float
     {
         $k1 = 1.2;
@@ -134,6 +170,14 @@ class HybridReranker implements RerankerInterface
         return $score;
     }
 
+    /**
+     * Calculate semantic similarity between query and document.
+     *
+     * @param array $queryEmbedding The query embedding
+     * @param string $document The document content
+     * @return float The semantic similarity score
+     * @throws HybridRAGException If calculation fails
+     */
     private function calculateSemanticSimilarity(array $queryEmbedding, string $document): float
     {
         try {
@@ -145,6 +189,12 @@ class HybridReranker implements RerankerInterface
         }
     }
 
+    /**
+     * Tokenize and filter stop words from the given text.
+     *
+     * @param string $text The text to tokenize
+     * @return array The tokenized and filtered words
+     */
     private function tokenize(string $text): array
     {
         $tokens = $this->tokenizer->tokenize(strtolower($text));
@@ -153,16 +203,36 @@ class HybridReranker implements RerankerInterface
         });
     }
 
+    /**
+     * Get the frequency of a term in the given terms.
+     *
+     * @param string $term The term to count
+     * @param array $terms The list of terms
+     * @return int The frequency of the term
+     */
     private function getTermFrequency(string $term, array $terms): int
     {
         return array_count_values($terms)[$term] ?? 0;
     }
 
+    /**
+     * Get the inverse document frequency for a term.
+     *
+     * @param string $term The term to look up
+     * @return float The inverse document frequency
+     */
     private function getInverseDocumentFrequency(string $term): float
     {
         return $this->inverseDocumentFrequency[$term] ?? 0;
     }
 
+    /**
+     * Calculate the cosine similarity between two vectors.
+     *
+     * @param array $a The first vector
+     * @param array $b The second vector
+     * @return float The cosine similarity
+     */
     private function cosineSimilarity(array $a, array $b): float
     {
         $dotProduct = 0;
@@ -181,6 +251,14 @@ class HybridReranker implements RerankerInterface
         return $dotProduct / ($magnitudeA * $magnitudeB);
     }
 
+    /**
+     * Generate a cache key for the given query and results.
+     *
+     * @param string $query The query string
+     * @param array $results The results array
+     * @param int $topK The number of top results
+     * @return string The generated cache key
+     */
     private function getCacheKey(string $query, array $results, int $topK): string
     {
         $resultsHash = md5(json_encode($results));

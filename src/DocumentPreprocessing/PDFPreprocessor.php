@@ -94,25 +94,4 @@ class PDFPreprocessor implements DocumentPreprocessorInterface
      * @return array An array of text chunks
      * @throws HybridRAGException If chunking fails
      */
-    public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200): array
-    {
-        try {
-            $this->logger->info("Chunking text", ['chunkSize' => $chunkSize, 'overlap' => $overlap]);
-            $tokens = $this->tokenizer->tokenize($text);
-            $chunks = [];
-            $start = 0;
-
-            while ($start < count($tokens)) {
-                $chunk = array_slice($tokens, $start, $chunkSize);
-                $chunks[] = implode(' ', $chunk);
-                $start += $chunkSize - $overlap;
-            }
-
-            $this->logger->info("Text chunked successfully", ['chunkCount' => count($chunks)]);
-            return $chunks;
-        } catch (\Exception $e) {
-            $this->logger->error("Failed to chunk text", ['error' => $e->getMessage()]);
-            throw new HybridRAGException("Failed to chunk text: " . $e->getMessage(), 0, $e);
-        }
-    }
-}
+    public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200):

@@ -8,14 +8,33 @@ use Psr\SimpleCache\CacheInterface;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
 
+/**
+ * Class KnowledgeGraphBuilder
+ *
+ * This class is responsible for building and managing the knowledge graph.
+ */
 class KnowledgeGraphBuilder
 {
+    /**
+     * KnowledgeGraphBuilder constructor.
+     *
+     * @param GraphDatabaseInterface $dbManager The graph database manager
+     * @param CacheInterface $cache The cache interface
+     * @param Logger $logger The logger
+     */
     public function __construct(
         private GraphDatabaseInterface $dbManager,
         private CacheInterface $cache,
         private Logger $logger
     ) {}
 
+    /**
+     * Add an entity to the knowledge graph.
+     *
+     * @param Entity $entity The entity to add
+     * @return string The ID of the added entity
+     * @throws HybridRAGException If adding the entity fails
+     */
     public function addEntity(Entity $entity): string
     {
         try {
@@ -29,6 +48,13 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Add a relationship to the knowledge graph.
+     *
+     * @param Relationship $relationship The relationship to add
+     * @return string The ID of the added relationship
+     * @throws HybridRAGException If adding the relationship fails
+     */
     public function addRelationship(Relationship $relationship): string
     {
         try {
@@ -47,6 +73,13 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Get an entity from the knowledge graph.
+     *
+     * @param string $id The ID of the entity to get
+     * @return Entity|null The entity, or null if not found
+     * @throws HybridRAGException If retrieving the entity fails
+     */
     public function getEntity(string $id): ?Entity
     {
         try {
@@ -73,6 +106,13 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Get a relationship from the knowledge graph.
+     *
+     * @param string $id The ID of the relationship to get
+     * @return Relationship|null The relationship, or null if not found
+     * @throws HybridRAGException If retrieving the relationship fails
+     */
     public function getRelationship(string $id): ?Relationship
     {
         try {
@@ -101,6 +141,12 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Update an entity in the knowledge graph.
+     *
+     * @param Entity $entity The entity to update
+     * @throws HybridRAGException If updating the entity fails
+     */
     public function updateEntity(Entity $entity): void
     {
         try {
@@ -113,6 +159,12 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Update a relationship in the knowledge graph.
+     *
+     * @param Relationship $relationship The relationship to update
+     * @throws HybridRAGException If updating the relationship fails
+     */
     public function updateRelationship(Relationship $relationship): void
     {
         try {
@@ -125,6 +177,14 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Execute a query on the knowledge graph.
+     *
+     * @param string $aql The AQL query to execute
+     * @param array $bindVars The bind variables for the query
+     * @return array The query results
+     * @throws HybridRAGException If executing the query fails
+     */
     public function query(string $aql, array $bindVars = []): array
     {
         try {
@@ -138,6 +198,14 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Perform a depth-first search on the knowledge graph.
+     *
+     * @param string $startId The ID of the starting node
+     * @param int $maxDepth The maximum depth to search
+     * @return array The search results
+     * @throws HybridRAGException If performing the search fails
+     */
     public function depthFirstSearch(string $startId, int $maxDepth = 3): array
     {
         try {
@@ -162,6 +230,14 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Perform a breadth-first search on the knowledge graph.
+     *
+     * @param string $startId The ID of the starting node
+     * @param int $maxDepth The maximum depth to search
+     * @return array The search results
+     * @throws HybridRAGException If performing the search fails
+     */
     public function breadthFirstSearch(string $startId, int $maxDepth = 3): array
     {
         try {
@@ -186,6 +262,14 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Find the shortest path between two nodes in the knowledge graph.
+     *
+     * @param string $startId The ID of the starting node
+     * @param string $endId The ID of the ending node
+     * @return array The shortest path
+     * @throws HybridRAGException If finding the shortest path fails
+     */
     public function shortestPath(string $startId, string $endId): array
     {
         try {
@@ -210,6 +294,13 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Calculate centrality for nodes in the knowledge graph.
+     *
+     * @param string $centralityType The type of centrality to calculate
+     * @return array The centrality results
+     * @throws HybridRAGException If calculating centrality fails
+     */
     public function calculateCentrality(string $centralityType = 'betweenness'): array
     {
         try {
@@ -233,6 +324,12 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Batch import entities into the knowledge graph.
+     *
+     * @param array $entities The entities to import
+     * @throws HybridRAGException If batch importing entities fails
+     */
     public function batchImportEntities(array $entities): void
     {
         try {
@@ -247,6 +344,12 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Batch import relationships into the knowledge graph.
+     *
+     * @param array $relationships The relationships to import
+     * @throws HybridRAGException If batch importing relationships fails
+     */
     public function batchImportRelationships(array $relationships): void
     {
         try {
@@ -261,6 +364,11 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Create indexes on the knowledge graph.
+     *
+     * @throws HybridRAGException If creating indexes fails
+     */
     public function createIndexes(): void
     {
         try {
@@ -275,6 +383,11 @@ class KnowledgeGraphBuilder
         }
     }
 
+    /**
+     * Optimize the knowledge graph.
+     *
+     * @throws HybridRAGException If optimizing the graph fails
+     */
     public function optimizeGraph(): void
     {
         try {

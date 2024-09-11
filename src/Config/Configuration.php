@@ -15,30 +15,32 @@ use HybridRAG\Exception\HybridRAGException;
 class Configuration
 {
     private array $config;
+    private string $configPath;
 
     /**
      * Configuration constructor.
      *
      * @param string $configPath The path to the configuration file
+     * @throws HybridRAGException If the configuration file is not found
      */
     public function __construct(string $configPath)
     {
-        $this->loadConfig($configPath);
+        $this->configPath = $configPath;
+        $this->loadConfig();
     }
 
     /**
      * Load the configuration from the given path.
      *
-     * @param string $configPath The path to the configuration file
      * @throws HybridRAGException If the configuration file is not found
      */
-    private function loadConfig(string $configPath): void
+    private function loadConfig(): void
     {
-        if (!file_exists($configPath)) {
-            throw new HybridRAGException("Configuration file not found: $configPath");
+        if (!file_exists($this->configPath)) {
+            throw new HybridRAGException("Configuration file not found: {$this->configPath}");
         }
 
-        $config = Yaml::parseFile($configPath);
+        $config = Yaml::parseFile($this->configPath);
         $this->config = $this->replaceEnvVariables($config);
     }
 

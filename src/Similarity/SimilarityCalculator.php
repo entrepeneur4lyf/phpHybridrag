@@ -4,8 +4,20 @@ declare(strict_types=1);
 
 namespace HybridRAG\Similarity;
 
+/**
+ * Class SimilarityCalculator
+ *
+ * This class provides methods to calculate similarity between vectors and texts.
+ */
 class SimilarityCalculator
 {
+    /**
+     * Calculate the cosine similarity between two vectors.
+     *
+     * @param array $vector1 The first vector
+     * @param array $vector2 The second vector
+     * @return float The cosine similarity between the two vectors
+     */
     public function calculateVectorSimilarity(array $vector1, array $vector2): float
     {
         $dotProduct = 0;
@@ -24,6 +36,13 @@ class SimilarityCalculator
         return $dotProduct / ($magnitude1 * $magnitude2);
     }
 
+    /**
+     * Calculate the Jaccard similarity between two texts.
+     *
+     * @param string $text1 The first text
+     * @param string $text2 The second text
+     * @return float The Jaccard similarity between the two texts
+     */
     public function calculateTextSimilarity(string $text1, string $text2): float
     {
         $set1 = array_flip(explode(' ', strtolower($text1)));

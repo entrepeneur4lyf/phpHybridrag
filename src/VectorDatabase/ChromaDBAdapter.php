@@ -9,12 +9,24 @@ use CodeWithKyrian\ChromaDB\Collection;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
 
+/**
+ * Class ChromaDBAdapter
+ *
+ * This class adapts the ChromaDB client to the VectorDatabaseInterface.
+ */
 class ChromaDBAdapter implements VectorDatabaseInterface
 {
     private ChromaDB $client;
     private Collection $collection;
     private Logger $logger;
 
+    /**
+     * ChromaDBAdapter constructor.
+     *
+     * @param array $config The configuration array for ChromaDB
+     * @param Logger $logger The logger instance
+     * @throws HybridRAGException If connection to ChromaDB fails
+     */
     public function __construct(array $config, Logger $logger)
     {
         $this->logger = $logger;
@@ -28,6 +40,14 @@ class ChromaDBAdapter implements VectorDatabaseInterface
         }
     }
 
+    /**
+     * Insert a vector into the ChromaDB collection.
+     *
+     * @param string $id The unique identifier for the vector
+     * @param array $vector The vector to insert
+     * @param array $metadata Additional metadata associated with the vector
+     * @throws HybridRAGException If insertion fails
+     */
     public function insert(string $id, array $vector, array $metadata = []): void
     {
         try {
@@ -43,6 +63,15 @@ class ChromaDBAdapter implements VectorDatabaseInterface
         }
     }
 
+    /**
+     * Query the ChromaDB collection for similar vectors.
+     *
+     * @param array $vector The query vector
+     * @param int $topK The number of top results to return
+     * @param array $filters Additional filters to apply to the query
+     * @return array An array of similar vectors and their metadata
+     * @throws HybridRAGException If querying fails
+     */
     public function query(array $vector, int $topK, array $filters = []): array
     {
         try {
@@ -59,6 +88,12 @@ class ChromaDBAdapter implements VectorDatabaseInterface
         }
     }
 
+    /**
+     * Format the query result from ChromaDB into a standardized format.
+     *
+     * @param array $result The raw query result from ChromaDB
+     * @return array The formatted query result
+     */
     private function formatQueryResult(array $result): array
     {
         $formattedResult = [];
@@ -71,5 +106,63 @@ class ChromaDBAdapter implements VectorDatabaseInterface
             ];
         }
         return $formattedResult;
+    }
+
+    /**
+     * Update an existing vector in the ChromaDB collection.
+     *
+     * @param string $id The unique identifier of the vector to update
+     * @param array $vector The new vector data
+     * @param array $metadata The new metadata associated with the vector
+     * @throws HybridRAGException If update fails
+     */
+    public function update(string $id, array $vector, array $metadata = []): void
+    {
+        try {
+            $this->collection->update(
+                ids: [$id],
+                embeddings: [$vector],
+                metadatas: [$metadata]
+            );
+            $this->logger->info("Vector updated in ChromaDB", ['id' => $id]);
+        } catch (\Exception $e) {
+            $this->logger->error("Failed to update vector in ChromaDB", ['id' => $id, 'error' => $e->getMessage()]);
+            throw new HybridRAGException("Failed to update vector in ChromaDB: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Delete a vector from the ChromaDB collection.
+     *
+     * @param string $id The unique identifier of the vector to delete
+     * @throws HybridRAGException If deletion fails
+     */
+    public function delete(string $id): void
+    {
+        try {
+            $this->collection->delete(ids: [$id]);
+            $this->logger->info("Vector deleted from ChromaDB", ['id' => $id]);
+        } catch (\Exception $e) {
+            $this->logger->error("Failed to delete vector from ChromaDB", ['id' => $id, 'error' => $e->getMessage()]);
+            throw new HybridRAGException("Failed to delete vector from ChromaDB: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Retrieve all documents from the ChromaDB collection.
+     *
+     * @return array An array of all documents in the collection
+     * @throws HybridRAGException If retrieval fails
+     */
+    public function getAllDocuments(): array
+    {
+        try {
+            $result = $this->collection->get();
+            $this->logger->info("Retrieved all documents from ChromaDB", ['count' => count($result['ids'])]);
+            return $this->formatQueryResult($result);
+        } catch (\Exception $e) {
+            $this->logger->error("Failed to retrieve all documents from ChromaDB", ['error' => $e->getMessage()]);
+            throw new HybridRAGException("Failed to retrieve all documents from ChromaDB: " . $e->getMessage(), 0, $e);
+        }
     }
 }

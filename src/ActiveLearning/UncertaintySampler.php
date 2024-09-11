@@ -6,15 +6,32 @@ namespace HybridRAG\ActiveLearning;
 
 use Phpml\Classification\Classifier;
 
+/**
+ * Class UncertaintySampler
+ *
+ * This class implements uncertainty sampling for active learning.
+ */
 class UncertaintySampler
 {
     private Classifier $classifier;
 
+    /**
+     * UncertaintySampler constructor.
+     *
+     * @param Classifier $classifier The classifier to use for uncertainty sampling
+     */
     public function __construct(Classifier $classifier)
     {
         $this->classifier = $classifier;
     }
 
+    /**
+     * Select samples for labeling based on uncertainty.
+     *
+     * @param array $unlabeledSamples The pool of unlabeled samples
+     * @param int $numSamples The number of samples to select
+     * @return array The selected samples
+     */
     public function selectSamples(array $unlabeledSamples, int $numSamples): array
     {
         $uncertainties = [];

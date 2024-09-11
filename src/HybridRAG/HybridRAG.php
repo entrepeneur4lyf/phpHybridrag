@@ -328,33 +328,6 @@ class HybridRAG implements HybridRAGInterface
     }
 
     /**
-     * Convert predictions to entities.
-     *
-     * @param array $tokens The tokens
-     * @param array $predictions The predictions
-     * @return array The converted entities
-     */
-    private function convertPredictionsToEntities(array $tokens, array $predictions): array
-    {
-        // This is a placeholder for converting predictions to entities
-        // In a production environment, you would use a more sophisticated NER system
-        return [];
-    }
-
-    /**
-     * Extract features from tokens.
-     *
-     * @param array $tokens The tokens to extract features from
-     * @return array The extracted features
-     */
-    private function extractFeatures(array $tokens): array
-    {
-        // This is a placeholder for extracting features
-        // In a production environment, you would use a more sophisticated feature extraction system
-        return [];
-    }
-
-    /**
      * Set the vector weight.
      *
      * @param float $weight The weight to set

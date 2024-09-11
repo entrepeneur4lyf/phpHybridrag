@@ -8,11 +8,19 @@ use Smalot\PdfParser\Parser;
 use Phpml\Tokenization\NGramTokenizer;
 use Phpml\FeatureExtraction\TfIdfTransformer;
 
+/**
+ * Class ImprovedPDFPreprocessor
+ *
+ * This class extends the PDFPreprocessor with improved text chunking using N-grams and TF-IDF.
+ */
 class ImprovedPDFPreprocessor extends PDFPreprocessor
 {
     private NGramTokenizer $nGramTokenizer;
     private TfIdfTransformer $tfidfTransformer;
 
+    /**
+     * ImprovedPDFPreprocessor constructor.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -20,6 +28,14 @@ class ImprovedPDFPreprocessor extends PDFPreprocessor
         $this->tfidfTransformer = new TfIdfTransformer();
     }
 
+    /**
+     * Chunk the text into smaller segments using N-grams and TF-IDF.
+     *
+     * @param string $text The text to chunk
+     * @param int $chunkSize The size of each chunk
+     * @param int $overlap The overlap between chunks
+     * @return array An array of text chunks
+     */
     public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200): array
     {
         $tokens = $this->nGramTokenizer->tokenize($text);
@@ -37,6 +53,13 @@ class ImprovedPDFPreprocessor extends PDFPreprocessor
         return $chunks;
     }
 
+    /**
+     * Reconstruct a chunk of text from tokens and their TF-IDF scores.
+     *
+     * @param array $tokens The tokens in the chunk
+     * @param array $tfidf The TF-IDF scores for the tokens
+     * @return string The reconstructed chunk
+     */
     private function reconstructChunk(array $tokens, array $tfidf): string
     {
         arsort($tfidf);

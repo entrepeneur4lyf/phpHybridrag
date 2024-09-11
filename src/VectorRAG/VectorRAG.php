@@ -12,10 +12,23 @@ use HybridRAG\Exception\HybridRAGException;
 use Phpml\Math\Distance\Euclidean;
 use HybridRAG\DocumentPreprocessing\DocumentPreprocessorFactory;
 
+/**
+ * Class VectorRAG
+ *
+ * Implements the VectorRAGInterface for Vector-based Retrieval-Augmented Generation.
+ */
 class VectorRAG implements VectorRAGInterface
 {
     private Euclidean $distance;
 
+    /**
+     * VectorRAG constructor.
+     *
+     * @param VectorDatabaseInterface $vectorDB The vector database interface
+     * @param EmbeddingInterface $embedding The embedding interface
+     * @param LanguageModelInterface $languageModel The language model interface
+     * @param Logger $logger The logger instance
+     */
     public function __construct(
         private VectorDatabaseInterface $vectorDB,
         private EmbeddingInterface $embedding,
@@ -25,6 +38,14 @@ class VectorRAG implements VectorRAGInterface
         $this->distance = new Euclidean();
     }
 
+    /**
+     * Add a document to the vector database.
+     *
+     * @param string $id The unique identifier for the document
+     * @param string $content The content of the document
+     * @param array $metadata Additional metadata associated with the document
+     * @throws HybridRAGException If adding the document fails
+     */
     public function addDocument(string $id, string $content, array $metadata = []): void
     {
         try {
@@ -38,6 +59,14 @@ class VectorRAG implements VectorRAGInterface
         }
     }
 
+    /**
+     * Add an image to the vector database.
+     *
+     * @param string $id The unique identifier for the image
+     * @param string $filePath The file path of the image
+     * @param array $metadata Additional metadata associated with the image
+     * @throws HybridRAGException If adding the image fails
+     */
     public function addImage(string $id, string $filePath, array $metadata = []): void
     {
         $preprocessor = DocumentPreprocessorFactory::create('image', $this->logger);
@@ -46,6 +75,14 @@ class VectorRAG implements VectorRAGInterface
         $this->addDocument($id, $content, array_merge($metadata, $extractedMetadata));
     }
 
+    /**
+     * Add an audio file to the vector database.
+     *
+     * @param string $id The unique identifier for the audio file
+     * @param string $filePath The file path of the audio file
+     * @param array $metadata Additional metadata associated with the audio file
+     * @throws HybridRAGException If adding the audio file fails
+     */
     public function addAudio(string $id, string $filePath, array $metadata = []): void
     {
         $preprocessor = DocumentPreprocessorFactory::create('audio', $this->logger);
@@ -54,6 +91,14 @@ class VectorRAG implements VectorRAGInterface
         $this->addDocument($id, $content, array_merge($metadata, $extractedMetadata));
     }
 
+    /**
+     * Add a video file to the vector database.
+     *
+     * @param string $id The unique identifier for the video file
+     * @param string $filePath The file path of the video file
+     * @param array $metadata Additional metadata associated with the video file
+     * @throws HybridRAGException If adding the video file fails
+     */
     public function addVideo(string $id, string $filePath, array $metadata = []): void
     {
         $preprocessor = DocumentPreprocessorFactory::create('video', $this->logger);
@@ -62,6 +107,15 @@ class VectorRAG implements VectorRAGInterface
         $this->addDocument($id, $content, array_merge($metadata, $extractedMetadata));
     }
 
+    /**
+     * Retrieve context for a given query.
+     *
+     * @param string $query The query string
+     * @param int $topK The number of top results to return
+     * @param array $filters Additional filters to apply to the query
+     * @return array An array of relevant context
+     * @throws HybridRAGException If retrieving context fails
+     */
     public function retrieveContext(string $query, int $topK = 5, array $filters = []): array
     {
         try {
@@ -96,6 +150,14 @@ class VectorRAG implements VectorRAGInterface
         }
     }
 
+    /**
+     * Generate an answer based on the query and provided context.
+     *
+     * @param string $query The query string
+     * @param array $context The context retrieved for the query
+     * @return string The generated answer
+     * @throws HybridRAGException If generating the answer fails
+     */
     public function generateAnswer(string $query, array $context): string
     {
         try {
