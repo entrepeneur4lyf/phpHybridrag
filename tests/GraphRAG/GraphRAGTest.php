@@ -173,4 +173,16 @@ class GraphRAGTest extends TestCase
 
         $this->assertEquals($expectedAnswer, $answer);
     }
+
+    public function testSetMaxDepth()
+    {
+        $newMaxDepth = 5;
+        $this->graphRAG->setMaxDepth($newMaxDepth);
+
+        $reflection = new \ReflectionClass($this->graphRAG);
+        $property = $reflection->getProperty('maxDepth');
+        $property->setAccessible(true);
+
+        $this->assertEquals($newMaxDepth, $property->getValue($this->graphRAG));
+    }
 }
