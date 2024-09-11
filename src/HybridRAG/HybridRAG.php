@@ -116,10 +116,10 @@ class HybridRAG implements HybridRAGInterface
             }
 
             $topics = $this->topicModeler->fit([$content]);
-            $metadata['topics'] = $topics['doc_topic_dist'][0];
+            $metadata['topics'] = $topics['doc_topic_dist'][0] ?? [];
 
             $sentiment = $this->sentimentAnalyzer->analyzeSentiment($content);
-            $metadata['sentiment'] = $sentiment;
+            $metadata['sentiment'] = $sentiment ?? 0;
 
             $this->logger->info("Document added successfully", ['id' => $id]);
         } catch (\Exception $e) {

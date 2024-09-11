@@ -14,7 +14,7 @@ class LoggerTest extends TestCase
     {
         $this->logPath = sys_get_temp_dir() . '/test_log.log';
         touch($this->logPath); // Ensure the log file is created
-        $this->logger = new Logger('test_logger', $this->logPath, 'debug', true);
+        $this->logger = new Logger('test_logger', $this->logPath, 'DEBUG', true);
     }
 
     protected function tearDown(): void
