@@ -44,6 +44,7 @@ class Configuration
             throw new HybridRAGException("Configuration file does not return an array");
         }
         $this->config = $this->replaceEnvVariables($config);
+        $this->config['sentiment_analysis']['lexicon_path'] = '/path/to/lexicon'; // Ensure this path is set correctly
     }
 
     /**
