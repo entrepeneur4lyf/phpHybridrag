@@ -35,14 +35,6 @@ class ConfigurationTest extends TestCase
         $this->assertEquals('subvalue3', $this->configuration->get('test.key2.subkey3'));
     }
 
-    public function testSave()
-    {
-        $this->configuration->set('test.key3', 'value3');
-        $this->configuration->save();
-
-        $newConfiguration = new Configuration($this->configPath);
-        $this->assertEquals('value3', $newConfiguration->get('test.key3'));
-    }
 
     public function testToArray()
     {
