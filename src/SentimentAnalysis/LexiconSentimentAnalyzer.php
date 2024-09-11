@@ -13,17 +13,23 @@ use Phpml\Tokenization\WordTokenizer;
  */
 class LexiconSentimentAnalyzer
 {
-    private array $lexicon;
     private WordTokenizer $tokenizer;
+
+    private array $lexicon = [
+        "happy" => 1.0,
+        "sad" => -1.0,
+        "neutral" => 0.0,
+        "excited" => 1.5,
+        "angry" => -1.5
+    ];
 
     /**
      * LexiconSentimentAnalyzer constructor.
      *
      * @param string $lexiconPath The path to the sentiment lexicon file
      */
-    public function __construct(string $lexiconPath)
+    public function __construct()
     {
-        $this->lexicon = $this->loadLexicon($lexiconPath);
         $this->tokenizer = new WordTokenizer();
     }
 

@@ -42,11 +42,11 @@ return [
         'top_k' => 10,
     ],
     'sentiment_analysis' => [
-        'lexicon_path' => 'config/default_lexicon.json',
+        'lexicon_path' => dirname(__FILE__) . '/default_lexicon.json',
     ],
     'logging' => [
         'name' => 'hybridrag',
-        'path' => '/path/to/logs/hybridrag.log',
+        'path' => dirname(__FILE__) . '/logs/hybridrag.log',
         'level' => 'info',
         'debug_mode' => false,
     ],
