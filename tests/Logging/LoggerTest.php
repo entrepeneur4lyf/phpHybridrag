@@ -16,7 +16,7 @@ class LoggerTest extends TestCase
         if (!file_exists($this->logPath)) {
             touch($this->logPath); // Ensure the log file is created
         }
-        $this->logger = new Logger('test_logger', $this->logPath, 'DEBUG', true);
+        $this->logger = new Logger('test_logger', $this->logPath, 'DEBUG', false); // Ensure debug mode is off for file logging
     }
 
     protected function tearDown(): void

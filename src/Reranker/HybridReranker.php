@@ -127,11 +127,11 @@ class HybridReranker implements RerankerInterface
                 }
             }
 
-            $this->averageDocumentLength = $totalDocuments > 0 ? $totalLength / $totalDocuments : 0;
+            $this->averageDocumentLength = $totalDocuments > 0 ? $totalLength / $totalDocuments : 1; // Avoid division by zero
 
             $this->inverseDocumentFrequency = [];
             foreach ($termDocumentFrequency as $term => $frequency) {
-                $this->inverseDocumentFrequency[$term] = log(($totalDocuments - $frequency + 0.5) / ($frequency + 0.5));
+                $this->inverseDocumentFrequency[$term] = $frequency > 0 ? log(($totalDocuments - $frequency + 0.5) / ($frequency + 0.5)) : 0;
             }
 
             $this->cache->set($cacheKey, [
