@@ -77,7 +77,11 @@ class HybridRAG implements HybridRAGInterface
         try {
             $this->nerClassifier = new NERClassifier();
             $this->topicModeler = new LDATopicModeler();
-            $this->sentimentAnalyzer = new LexiconSentimentAnalyzer($this->config->get('sentiment_analysis.lexicon_path'));
+            $lexiconPath = $this->config->get('sentiment_analysis.lexicon_path');
+            if ($lexiconPath === null) {
+                throw new HybridRAGException('Lexicon path for sentiment analysis is not configured.');
+            }
+            $this->sentimentAnalyzer = new LexiconSentimentAnalyzer($lexiconPath);
             $this->activeLearner = new UncertaintySampler($this->nerClassifier);
             $this->evaluationMetrics = new EvaluationMetrics($this->languageModel);
             $this->trainNERClassifier();
