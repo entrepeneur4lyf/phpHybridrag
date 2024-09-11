@@ -13,14 +13,8 @@ class ConfigurationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configPath = sys_get_temp_dir() . '/test_config.yaml';
-        file_put_contents($this->configPath, "
-            test:
-                key1: value1
-                key2: 
-                    subkey1: subvalue1
-                    subkey2: subvalue2
-        ");
+        $this->configPath = sys_get_temp_dir() . '/test_config.php';
+        file_put_contents($this->configPath, "<?php\n\nreturn [\n    'test' => [\n        'key1' => 'value1',\n        'key2' => [\n            'subkey1' => 'subvalue1',\n            'subkey2' => 'subvalue2',\n        ],\n    ],\n];");
         $this->configuration = new Configuration($this->configPath);
     }
 
@@ -66,6 +60,6 @@ class ConfigurationTest extends TestCase
     public function testLoadInvalidConfigFile()
     {
         $this->expectException(HybridRAGException::class);
-        new Configuration('nonexistent.file');
+        new Configuration('nonexistent.php');
     }
 }
