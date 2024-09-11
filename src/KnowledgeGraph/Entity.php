@@ -24,7 +24,6 @@ class Entity
     public function __construct(string $collection, array $properties)
     {
         $this->document = new Document();
-        $this->document->setCollection($collection);
         foreach ($properties as $key => $value) {
             $this->document->set($key, $value);
         }

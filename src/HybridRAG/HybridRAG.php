@@ -109,7 +109,7 @@ class HybridRAG implements HybridRAGInterface
                 }
             }
 
-            $entities = $this->extractEntities($content);
+            $entities = $this->extractEntities($content) ?? [];
             foreach ($entities as $entity) {
                 $entityId = $this->graphRAG->addEntity($entity, $entity, ['type' => 'extracted']);
                 $this->graphRAG->addRelationship($id, $entityId, 'CONTAINS');
