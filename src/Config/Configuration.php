@@ -26,6 +26,50 @@ class Configuration
     {
         $this->configPath = $configPath;
         $this->loadConfig();
+        $this->initializeProperties();
+    }
+
+    /**
+     * Initialize properties from the configuration array.
+     */
+    private function initializeProperties(): void
+    {
+        foreach ($this->config as $key => $value) {
+            $this->{$key} = $value;
+        }
+    }
+
+    /**
+     * Magic method to get a configuration property.
+     *
+     * @param string $name The property name
+     * @return mixed The property value
+     * @throws HybridRAGException If the property does not exist
+     */
+    public function __get(string $name)
+    {
+        if (property_exists($this, $name)) {
+            return $this->{$name};
+        }
+
+        throw new HybridRAGException("Configuration property '{$name}' does not exist.");
+    }
+
+    /**
+     * Magic method to set a configuration property.
+     *
+     * @param string $name The property name
+     * @param mixed $value The property value
+     * @throws HybridRAGException If the property does not exist
+     */
+    public function __set(string $name, $value): void
+    {
+        if (property_exists($this, $name)) {
+            $this->{$name} = $value;
+            return;
+        }
+
+        throw new HybridRAGException("Configuration property '{$name}' does not exist.");
     }
 
     /**
