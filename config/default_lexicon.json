@@ -1,0 +1,7 @@
+{
+    "happy": 1.0,
+    "sad": -1.0,
+    "neutral": 0.0,
+    "excited": 1.5,
+    "angry": -1.5
+}
