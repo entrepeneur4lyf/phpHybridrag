@@ -33,7 +33,7 @@ HybridRAG is a PHP library that implements a Hybrid Retrieval-Augmented Generati
 You can install HybridRAG via Composer. Run the following command in your project directory:
 
 ```bash
-composer require your-vendor/hybrid-rag
+composer require hybridrag/hybridrag
 ```
 
 ### Self-hosting ChromaDB and ArangoDB
