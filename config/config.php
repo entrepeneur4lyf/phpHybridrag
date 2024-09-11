@@ -41,6 +41,9 @@ return [
         'semantic_weight' => 0.5,
         'top_k' => 10,
     ],
+    'sentiment_analysis' => [
+        'lexicon_path' => 'config/default_lexicon.json',
+    ],
     'logging' => [
         'name' => 'hybridrag',
         'path' => '/path/to/logs/hybridrag.log',
