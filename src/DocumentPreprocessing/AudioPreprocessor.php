@@ -10,17 +10,35 @@ use OpenAI;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 
+/**
+ * Class AudioPreprocessor
+ *
+ * This class is responsible for preprocessing audio documents.
+ */
 class AudioPreprocessor implements DocumentPreprocessorInterface
 {
     private Logger $logger;
     private OpenAI\Client $openai;
 
+    /**
+     * AudioPreprocessor constructor.
+     *
+     * @param Logger $logger The logger instance
+     * @param string $openaiApiKey The OpenAI API key
+     */
     public function __construct(Logger $logger, string $openaiApiKey)
     {
         $this->logger = $logger;
         $this->openai = OpenAI::client($openaiApiKey);
     }
 
+    /**
+     * Parse the audio document and convert it to text.
+     *
+     * @param string $filePath The path to the audio file
+     * @return string The parsed text from the audio
+     * @throws HybridRAGException If parsing fails
+     */
     public function parseDocument(string $filePath): string
     {
         try {
@@ -40,6 +58,13 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Extract metadata from the audio file.
+     *
+     * @param string $filePath The path to the audio file
+     * @return array The extracted metadata
+     * @throws HybridRAGException If metadata extraction fails
+     */
     public function extractMetadata(string $filePath): array
     {
         try {
@@ -63,6 +88,14 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Chunk the text into smaller segments.
+     *
+     * @param string $text The text to chunk
+     * @param int $chunkSize The size of each chunk
+     * @param int $overlap The overlap between chunks
+     * @return array An array of text chunks
+     */
     public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200): array
     {
         $words = explode(' ', $text);
@@ -88,6 +121,12 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
         return $chunks;
     }
 
+    /**
+     * Convert the audio file to MP3 format.
+     *
+     * @param string $filePath The path to the audio file
+     * @return string The path to the converted MP3 file
+     */
     private function convertToMp3(string $filePath): string
     {
         $ffmpeg = FFMpeg::create();
@@ -100,6 +139,12 @@ class AudioPreprocessor implements DocumentPreprocessorInterface
         return $mp3Path;
     }
 
+    /**
+     * Perform speech-to-text conversion using OpenAI's Whisper model.
+     *
+     * @param string $audioPath The path to the audio file
+     * @return string The transcribed text
+     */
     private function performSpeechToText(string $audioPath): string
     {
         $response = $this->openai->audio()->transcribe([

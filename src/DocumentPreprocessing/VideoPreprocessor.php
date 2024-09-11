@@ -10,6 +10,11 @@ use FFMpeg\FFMpeg;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\Filters\Video\VideoFilters;
 
+/**
+ * Class VideoPreprocessor
+ *
+ * This class is responsible for preprocessing video documents.
+ */
 class VideoPreprocessor implements DocumentPreprocessorInterface
 {
     private Logger $logger;
@@ -17,6 +22,13 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
     private ImagePreprocessor $imagePreprocessor;
     private FFMpeg $ffmpeg;
 
+    /**
+     * VideoPreprocessor constructor.
+     *
+     * @param Logger $logger The logger instance
+     * @param AudioPreprocessor $audioPreprocessor The audio preprocessor instance
+     * @param ImagePreprocessor $imagePreprocessor The image preprocessor instance
+     */
     public function __construct(Logger $logger, AudioPreprocessor $audioPreprocessor, ImagePreprocessor $imagePreprocessor)
     {
         $this->logger = $logger;
@@ -25,6 +37,13 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         $this->ffmpeg = FFMpeg::create();
     }
 
+    /**
+     * Parse the video document and extract its content.
+     *
+     * @param string $filePath The path to the video file
+     * @return string The extracted content from the video
+     * @throws HybridRAGException If parsing fails
+     */
     public function parseDocument(string $filePath): string
     {
         try {
@@ -52,6 +71,13 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Extract metadata from the video file.
+     *
+     * @param string $filePath The path to the video file
+     * @return array The extracted metadata
+     * @throws HybridRAGException If metadata extraction fails
+     */
     public function extractMetadata(string $filePath): array
     {
         try {
@@ -77,6 +103,14 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Chunk the text into smaller segments.
+     *
+     * @param string $text The text to chunk
+     * @param int $chunkSize The size of each chunk
+     * @param int $overlap The overlap between chunks
+     * @return array An array of text chunks
+     */
     public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200): array
     {
         $words = explode(' ', $text);
@@ -102,6 +136,12 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         return $chunks;
     }
 
+    /**
+     * Extract audio from the video file.
+     *
+     * @param string $videoPath The path to the video file
+     * @return string The path to the extracted audio file
+     */
     private function extractAudio(string $videoPath): string
     {
         $video = $this->ffmpeg->open($videoPath);
@@ -113,6 +153,12 @@ class VideoPreprocessor implements DocumentPreprocessorInterface
         return $audioPath;
     }
 
+    /**
+     * Extract key frames from the video file.
+     *
+     * @param string $videoPath The path to the video file
+     * @return array An array of paths to the extracted key frame images
+     */
     private function extractKeyFrames(string $videoPath): array
     {
         $video = $this->ffmpeg->open($videoPath);

@@ -10,12 +10,22 @@ use Phpml\FeatureExtraction\TfIdfTransformer;
 use HybridRAG\Exception\HybridRAGException;
 use HybridRAG\Logging\Logger;
 
+/**
+ * Class PDFPreprocessor
+ *
+ * This class is responsible for preprocessing PDF documents.
+ */
 class PDFPreprocessor implements DocumentPreprocessorInterface
 {
     private Parser $parser;
     private WhitespaceTokenizer $tokenizer;
     private TfIdfTransformer $tfidfTransformer;
 
+    /**
+     * PDFPreprocessor constructor.
+     *
+     * @param Logger $logger The logger instance
+     */
     public function __construct(private Logger $logger)
     {
         $this->parser = new Parser();
@@ -23,6 +33,13 @@ class PDFPreprocessor implements DocumentPreprocessorInterface
         $this->tfidfTransformer = new TfIdfTransformer();
     }
 
+    /**
+     * Parse the PDF document and extract its text content.
+     *
+     * @param string $filePath The path to the PDF file
+     * @return string The extracted text from the PDF
+     * @throws HybridRAGException If parsing fails
+     */
     public function parseDocument(string $filePath): string
     {
         try {
@@ -37,6 +54,13 @@ class PDFPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Extract metadata from the PDF document.
+     *
+     * @param string $filePath The path to the PDF file
+     * @return array The extracted metadata
+     * @throws HybridRAGException If metadata extraction fails
+     */
     public function extractMetadata(string $filePath): array
     {
         try {
@@ -61,6 +85,15 @@ class PDFPreprocessor implements DocumentPreprocessorInterface
         }
     }
 
+    /**
+     * Chunk the text into smaller segments.
+     *
+     * @param string $text The text to chunk
+     * @param int $chunkSize The size of each chunk
+     * @param int $overlap The overlap between chunks
+     * @return array An array of text chunks
+     * @throws HybridRAGException If chunking fails
+     */
     public function chunkText(string $text, int $chunkSize = 1000, int $overlap = 200): array
     {
         try {
