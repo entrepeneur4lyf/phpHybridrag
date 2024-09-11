@@ -17,7 +17,6 @@
         "openai-php/client": "^0.4.0",
         "php-ai/php-ml": "^0.10.0",
         "psr/simple-cache": "^3.0",
-        "symfony/yaml": "^5.0",
         "triagens/arangodb": "^3.8"
     },
     "require-dev": {
