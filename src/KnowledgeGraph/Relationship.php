@@ -26,7 +26,6 @@ class Relationship
     public function __construct(string $collection, Entity $from, Entity $to, array $attributes = [])
     {
         $this->edge = new Edge();
-        $this->edge->setCollection($collection);
         $this->edge->setFrom($from->getId());
         $this->edge->setTo($to->getId());
         foreach ($attributes as $key => $value) {

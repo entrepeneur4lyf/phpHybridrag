@@ -3,6 +3,7 @@
     "description": "A Hybrid Retrieval-Augmented Generation system combining vector and graph-based approaches",
     "type": "library",
     "license": "MIT",
+    "version": "0.1.0",
     "authors": [
         {
             "name": "Shawn McAllister",
