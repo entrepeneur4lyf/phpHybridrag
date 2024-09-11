@@ -252,7 +252,7 @@ class HybridReranker implements RerankerInterface
         $magnitudeA = sqrt($magnitudeA);
         $magnitudeB = sqrt($magnitudeB);
 
-        return $dotProduct / ($magnitudeA * $magnitudeB);
+        return ($magnitudeA * $magnitudeB) != 0 ? $dotProduct / ($magnitudeA * $magnitudeB) : 0.0;
     }
 
     /**
