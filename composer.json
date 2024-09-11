@@ -1,0 +1,41 @@
+{
+    "name": "hybridrag/hybridrag",
+    "description": "A Hybrid Retrieval-Augmented Generation system combining vector and graph-based approaches",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "symfony/yaml": "^5.0",
+        "monolog/monolog": "^2.0",
+        "php-ai/php-ml": "^0.9.0",
+        "codewithkyrian/chromadb-php": "^1.0",
+        "openai-php/client": "^0.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HybridRAG\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
