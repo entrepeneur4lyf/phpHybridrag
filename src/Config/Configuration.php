@@ -39,12 +39,11 @@ class Configuration
             throw new HybridRAGException("Configuration file not found: {$this->configPath}");
         }
 
-        $configContent = file_get_contents($this->configPath);
-        $config = json_decode($configContent, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new HybridRAGException("Failed to parse JSON configuration: " . json_last_error_msg());
+        $config = include $this->configPath;
+        if (!is_array($config)) {
+            throw new HybridRAGException("Configuration file does not return an array");
         }
-        $this->config = $this->replaceEnvVariables($config);
+        $this->config = $config;
     }
 
     /**
