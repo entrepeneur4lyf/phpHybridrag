@@ -20,7 +20,7 @@ class HybridRAGIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $config = new Configuration('path/to/test/config.yaml');
+        $config = new Configuration('config/config.php');
         $logger = new Logger('test_logger', 'path/to/test.log');
 
         $vectorDB = new ChromaDB($config->get('chromadb'));
