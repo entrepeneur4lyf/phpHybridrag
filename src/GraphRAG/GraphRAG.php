@@ -80,6 +80,7 @@ class GraphRAG implements GraphRAGInterface
             $from = $this->kg->getEntity($fromId);
             $to = $this->kg->getEntity($toId);
             if (!$from || !$to) {
+                $this->logger->error("One or both entities do not exist", ['fromId' => $fromId, 'toId' => $toId]);
                 throw new \InvalidArgumentException("One or both entities do not exist.");
             }
             $relationship = new \HybridRAG\KnowledgeGraph\Relationship('relationships', $from, $to, array_merge(['type' => $type], $attributes));

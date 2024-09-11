@@ -140,8 +140,11 @@ class HybridRAG implements HybridRAGInterface
         try {
             $this->logger->info("Retrieving context", ['query' => $query]);
             
-            $vectorContext = $this->vectorRAG->retrieveContext($query, $this->config->get('hybridrag.top_k'));
-            $graphContext = $this->graphRAG->retrieveContext($query, $this->config->get('hybridrag.max_depth'));
+            $topK = $this->config->get('hybridrag.top_k') ?? 5; // Default value if not set
+            $maxDepth = $this->config->get('hybridrag.max_depth') ?? 2; // Default value if not set
+
+            $vectorContext = $this->vectorRAG->retrieveContext($query, $topK);
+            $graphContext = $this->graphRAG->retrieveContext($query, $maxDepth);
 
             $mergedContext = $this->mergeContext($vectorContext, $graphContext);
             
