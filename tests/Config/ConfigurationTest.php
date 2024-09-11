@@ -13,15 +13,10 @@ class ConfigurationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configPath = sys_get_temp_dir() . '/test_config.php';
-        file_put_contents($this->configPath, "<?php\n\nreturn [\n    'test' => [\n        'key1' => 'value1',\n        'key2' => [\n            'subkey1' => 'subvalue1',\n            'subkey2' => 'subvalue2',\n        ],\n    ],\n];");
+        $this->configPath = __DIR__ . '/../../config/config.php';
         $this->configuration = new Configuration($this->configPath);
     }
 
-    protected function tearDown(): void
-    {
-        unlink($this->configPath);
-    }
 
     public function testGet()
     {
