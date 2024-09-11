@@ -7,15 +7,31 @@ namespace HybridRAG\Config;
 use Symfony\Component\Yaml\Yaml;
 use HybridRAG\Exception\HybridRAGException;
 
+/**
+ * Class Configuration
+ *
+ * This class handles the configuration management for the HybridRAG system.
+ */
 class Configuration
 {
     private array $config;
 
+    /**
+     * Configuration constructor.
+     *
+     * @param string $configPath The path to the configuration file
+     */
     public function __construct(string $configPath)
     {
         $this->loadConfig($configPath);
     }
 
+    /**
+     * Load the configuration from the given path.
+     *
+     * @param string $configPath The path to the configuration file
+     * @throws HybridRAGException If the configuration file is not found
+     */
     private function loadConfig(string $configPath): void
     {
         if (!file_exists($configPath)) {
@@ -26,6 +42,12 @@ class Configuration
         $this->config = $this->replaceEnvVariables($config);
     }
 
+    /**
+     * Replace environment variables in the configuration.
+     *
+     * @param array $config The configuration array
+     * @return array The configuration with environment variables replaced
+     */
     private function replaceEnvVariables(array $config): array
     {
         array_walk_recursive($config, function (&$value) {
@@ -38,17 +60,35 @@ class Configuration
         return $config;
     }
 
+    /**
+     * Get a configuration value by key.
+     *
+     * @param string $key The configuration key (dot notation supported)
+     * @param mixed $default The default value if the key is not found
+     * @return mixed The configuration value
+     */
     public function get(string $key, $default = null)
     {
         return $this->getNestedValue($this->config, explode('.', $key), $default);
     }
 
+    /**
+     * Set a configuration value.
+     *
+     * @param string $key The configuration key (dot notation supported)
+     * @param mixed $value The value to set
+     */
     public function set(string $key, $value): void
     {
         $keys = explode('.', $key);
         $this->setNestedValue($this->config, $keys, $value);
     }
 
+    /**
+     * Save the current configuration to the file.
+     *
+     * @throws HybridRAGException If the file format is not supported
+     */
     public function save(): void
     {
         $extension = pathinfo($this->configPath, PATHINFO_EXTENSION);
@@ -62,11 +102,24 @@ class Configuration
         }
     }
 
+    /**
+     * Get the entire configuration as an array.
+     *
+     * @return array The configuration array
+     */
     public function toArray(): array
     {
         return $this->config;
     }
 
+    /**
+     * Get a nested value from an array using an array of keys.
+     *
+     * @param array $array The array to search in
+     * @param array $keys The keys to traverse
+     * @param mixed $default The default value if the key is not found
+     * @return mixed The nested value or the default
+     */
     private function getNestedValue(array $array, array $keys, $default = null)
     {
         foreach ($keys as $key) {
@@ -78,6 +131,13 @@ class Configuration
         return $array;
     }
 
+    /**
+     * Set a nested value in an array using an array of keys.
+     *
+     * @param array $array The array to modify
+     * @param array $keys The keys to traverse
+     * @param mixed $value The value to set
+     */
     private function setNestedValue(array &$array, array $keys, $value): void
     {
         $current = &$array;

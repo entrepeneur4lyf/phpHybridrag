@@ -7,6 +7,11 @@ namespace HybridRAG\AnomalyDetection;
 use Phpml\Preprocessing\Normalizer;
 use Phpml\Math\Distance\Euclidean;
 
+/**
+ * Class IsolationForestDetector
+ *
+ * This class implements the Isolation Forest algorithm for anomaly detection.
+ */
 class IsolationForestDetector
 {
     private int $subsampleSize;
@@ -14,6 +19,12 @@ class IsolationForestDetector
     private Normalizer $normalizer;
     private Euclidean $distance;
 
+    /**
+     * IsolationForestDetector constructor.
+     *
+     * @param int $subsampleSize The size of the subsample to use for each tree
+     * @param int $numTrees The number of trees in the forest
+     */
     public function __construct(int $subsampleSize = 256, int $numTrees = 100)
     {
         $this->subsampleSize = $subsampleSize;
@@ -22,6 +33,11 @@ class IsolationForestDetector
         $this->distance = new Euclidean();
     }
 
+    /**
+     * Fit the Isolation Forest model to the given data.
+     *
+     * @param array $data The input data to fit the model to
+     */
     public function fit(array $data): void
     {
         $this->data = $this->normalizer->transform($data);
@@ -31,6 +47,12 @@ class IsolationForestDetector
         }
     }
 
+    /**
+     * Predict the anomaly score for a given sample.
+     *
+     * @param array $sample The sample to predict the anomaly score for
+     * @return float The anomaly score
+     */
     public function predict(array $sample): float
     {
         $sample = $this->normalizer->transform([$sample])[0];
@@ -42,6 +64,13 @@ class IsolationForestDetector
         return 2 ** (-$averagePathLength / $this->calculateC($this->subsampleSize));
     }
 
+    /**
+     * Build a single isolation tree.
+     *
+     * @param array $data The data to build the tree from
+     * @param int $depth The current depth of the tree
+     * @return array The built tree
+     */
     private function buildTree(array $data, int $depth): array
     {
         if (count($data) <= 1 || $depth >= $this->calculateC($this->subsampleSize)) {
@@ -66,6 +95,14 @@ class IsolationForestDetector
         ];
     }
 
+    /**
+     * Traverse the isolation tree for a given sample.
+     *
+     * @param array $node The current node in the tree
+     * @param array $sample The sample to traverse the tree with
+     * @param int $depth The current depth in the tree
+     * @return int The path length for this sample
+     */
     private function traverseTree(array $node, array $sample, int $depth): int
     {
         if ($node['type'] === 'leaf') {
@@ -79,11 +116,24 @@ class IsolationForestDetector
         }
     }
 
+    /**
+     * Calculate the normalization factor C(n).
+     *
+     * @param int $n The size of the sample
+     * @return float The calculated C(n) value
+     */
     private function calculateC(int $n): float
     {
         return 2 * (log($n - 1) + 0.5772156649) - (2 * ($n - 1) / $n);
     }
 
+    /**
+     * Generate a random number between min and max.
+     *
+     * @param float $min The minimum value
+     * @param float $max The maximum value
+     * @return float A random number between min and max
+     */
     private function randomBetween(float $min, float $max): float
     {
         return $min + mt_rand() / mt_getrandmax() * ($max - $min);
