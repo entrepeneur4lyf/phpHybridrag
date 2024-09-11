@@ -7,9 +7,13 @@ HybridRAG is a PHP library that implements a Hybrid Retrieval-Augmented Generati
 - [HybridRAG](#hybridrag)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
-  - [Requirements](#requirements)
+    - [Requirements](#requirements)
+    - [Composer Installation](#composer-installation)
+    - [Self-hosting ChromaDB and ArangoDB](#self-hosting-chromadb-and-arangodb)
   - [Configuration](#configuration)
   - [Usage](#usage)
+    - [Basic Example](#basic-example)
+    - [Advanced Examples](#advanced-examples)
   - [Components](#components)
   - [Testing](#testing)
   - [Contributing](#contributing)
@@ -17,19 +21,56 @@ HybridRAG is a PHP library that implements a Hybrid Retrieval-Augmented Generati
 
 ## Installation
 
+### Requirements
+
+- PHP 8.3 or higher
+- Composer
+- Docker (for self-hosting ChromaDB and ArangoDB)
+- OpenAI API key (for embeddings and language model)
+
+### Composer Installation
+
 You can install HybridRAG via Composer. Run the following command in your project directory:
 
 ```bash
 composer require your-vendor/hybrid-rag
 ```
 
-## Requirements
+### Self-hosting ChromaDB and ArangoDB
 
-- PHP 8.3 or higher
-- Composer
-- ArangoDB (for graph database)
-- ChromaDB (for vector database)
-- OpenAI API key (for embeddings and language model)
+To self-host ChromaDB and ArangoDB using Docker, follow these steps:
+
+1. Install Docker on your system if you haven't already.
+
+2. Create a `docker-compose.yml` file in your project root with the following content:
+
+```yaml
+version: '3'
+services:
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_data:/chroma/chroma
+
+  arangodb:
+    image: arangodb:latest
+    environment:
+      ARANGO_ROOT_PASSWORD: your_root_password
+    ports:
+      - "8529:8529"
+    volumes:
+      - ./arango_data:/var/lib/arangodb3
+```
+
+3. Start the containers:
+
+```bash
+docker-compose up -d
+```
+
+Now ChromaDB will be available at `http://localhost:8000` and ArangoDB at `http://localhost:8529`.
 
 ## Configuration
 
@@ -45,7 +86,7 @@ arangodb:
   port: 8529
   database: "hybrid_rag"
   username: "root"
-  password: "your-password"
+  password: "your_root_password"
 
 chromadb:
   host: "localhost"
@@ -60,6 +101,8 @@ logging:
 ```
 
 ## Usage
+
+### Basic Example
 
 Here's a basic example of how to use HybridRAG:
 
@@ -84,6 +127,10 @@ $answer = $hybridRAG->generateAnswer($query, $context);
 echo $answer;
 ```
 
+### Advanced Examples
+
+For more advanced usage examples, including working with different document types, customizing the retrieval process, and evaluating system performance, please refer to the [Advanced Usage Guide](docs/advanced_usage.md).
+
 ## Components
 
 HybridRAG consists of several main components:
@@ -93,6 +140,8 @@ HybridRAG consists of several main components:
 - Reranker: Combines and reranks results from both approaches
 - LanguageModel: Generates answers based on the retrieved context
 
+For detailed information about each component and how to customize them, please see the [Components Documentation](docs/components.md).
+
 ## Testing
 
 To run the test suite, use the following command:
@@ -101,9 +150,11 @@ To run the test suite, use the following command:
 vendor/bin/phpunit
 ```
 
+For more information on testing, including how to write and run specific tests, see the [Testing Guide](docs/testing.md).
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and suggest improvements.
 
 ## License
 
