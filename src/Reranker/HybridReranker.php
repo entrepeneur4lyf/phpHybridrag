@@ -168,7 +168,10 @@ class HybridReranker implements RerankerInterface
         foreach ($queryTerms as $term) {
             $termFrequency = $this->getTermFrequency($term, $documentTerms);
             $inverseDocumentFrequency = $this->getInverseDocumentFrequency($term);
-            $score += $inverseDocumentFrequency * (($termFrequency * ($k1 + 1)) / ($termFrequency + $k1 * (1 - $b + $b * ($documentLength / $this->averageDocumentLength))));
+            $denominator = $termFrequency + $k1 * (1 - $b + $b * ($documentLength / $this->averageDocumentLength));
+            if ($denominator != 0) {
+                $score += $inverseDocumentFrequency * (($termFrequency * ($k1 + 1)) / $denominator);
+            }
         }
 
         return $score;

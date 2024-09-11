@@ -13,7 +13,9 @@ class LoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->logPath = sys_get_temp_dir() . '/test_log.log';
-        touch($this->logPath); // Ensure the log file is created
+        if (!file_exists($this->logPath)) {
+            touch($this->logPath); // Ensure the log file is created
+        }
         $this->logger = new Logger('test_logger', $this->logPath, 'DEBUG', true);
     }
 
