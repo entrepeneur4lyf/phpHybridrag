@@ -60,10 +60,10 @@ class HybridRAG implements HybridRAGInterface
     {
         $logConfig = $this->config->get('logging');
         $this->logger = new Logger(
-            $logConfig['name'],
-            $logConfig['path'],
-            $logConfig['level'],
-            $logConfig['debug_mode']
+            $logConfig['name'] ?? 'default_logger',
+            $logConfig['path'] ?? '/tmp/default.log',
+            $logConfig['level'] ?? 'INFO',
+            $logConfig['debug_mode'] ?? false
         );
     }
 

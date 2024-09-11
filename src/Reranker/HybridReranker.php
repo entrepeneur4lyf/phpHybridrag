@@ -188,7 +188,7 @@ class HybridReranker implements RerankerInterface
     private function calculateSemanticSimilarity(array $queryEmbedding, string $document): float
     {
         try {
-            $documentEmbedding = $this->embedding->embed($document);
+            $documentEmbedding = $this->embedding->embed($document) ?? [];
             return $this->cosineSimilarity($queryEmbedding, $documentEmbedding);
         } catch (\Exception $e) {
             $this->logger->error("Failed to calculate semantic similarity", ['error' => $e->getMessage()]);
