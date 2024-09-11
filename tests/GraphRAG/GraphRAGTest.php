@@ -69,15 +69,16 @@ class GraphRAGTest extends TestCase
         $type = 'TEST_RELATION';
         $attributes = ['key' => 'value'];
 
-        $this->kg->expects($this->once())
+        $this->kg->expects($this->exactly(2))
             ->method('getEntity')
-            ->with($fromId)
-            ->willReturn(new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $fromId]));
-
-        $this->kg->expects($this->once())
-            ->method('getEntity')
-            ->with($toId)
-            ->willReturn(new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $toId]));
+            ->willReturnCallback(function ($id) use ($fromId, $toId) {
+                if ($id === $fromId) {
+                    return new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $fromId]);
+                } elseif ($id === $toId) {
+                    return new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $toId]);
+                }
+                return null;
+            });
 
         $this->kg->expects($this->once())
             ->method('addRelationship')
