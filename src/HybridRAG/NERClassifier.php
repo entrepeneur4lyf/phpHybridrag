@@ -16,7 +16,7 @@ use Phpml\Clustering\DBSCAN;
  * This class implements an improved Named Entity Recognition (NER) classifier
  * using Support Vector Classification (SVC) and DBSCAN clustering.
  */
-class NERClassifier
+class NERClassifier implements \Phpml\Classification\Classifier
 {
     private SVC $classifier;
     private TokenCountVectorizer $vectorizer;
