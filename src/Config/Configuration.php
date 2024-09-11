@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace HybridRAG\Config;
 
-use Symfony\Component\Yaml\Yaml;
 use HybridRAG\Exception\HybridRAGException;
 
 /**
@@ -40,7 +39,11 @@ class Configuration
             throw new HybridRAGException("Configuration file not found: {$this->configPath}");
         }
 
-        $config = Yaml::parseFile($this->configPath);
+        $configContent = file_get_contents($this->configPath);
+        $config = json_decode($configContent, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new HybridRAGException("Failed to parse JSON configuration: " . json_last_error_msg());
+        }
         $this->config = $this->replaceEnvVariables($config);
     }
 
@@ -95,9 +98,7 @@ class Configuration
     {
         $extension = pathinfo($this->configPath, PATHINFO_EXTENSION);
         
-        if ($extension === 'yaml' || $extension === 'yml') {
-            file_put_contents($this->configPath, Yaml::dump($this->config, 4, 2));
-        } elseif ($extension === 'json') {
+        if ($extension === 'json') {
             file_put_contents($this->configPath, json_encode($this->config, JSON_PRETTY_PRINT));
         } else {
             throw new HybridRAGException("Unsupported configuration file format: $extension");
