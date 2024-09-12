@@ -23,10 +23,10 @@ class HybridRAGIntegrationTest extends TestCase
         $config = new Configuration('config/config.php');
         $logger = new Logger('test_logger', 'path/to/test.log');
 
-        $vectorDB = new ChromaDB($config->get('chromadb'));
-        $graphDB = new ArangoDBManager($config->get('arangodb'));
-        $embedding = new OpenAIEmbedding($config->get('openai.api_key'));
-        $languageModel = new OpenAILanguageModel($config->get('openai.api_key'), $config->get('openai.language_model'), $logger);
+        $vectorDB = new ChromaDB($config->chromadb);
+        $graphDB = new ArangoDBManager($config->arangodb);
+        $embedding = new OpenAIEmbedding($config->openai->api_key);
+        $languageModel = new OpenAILanguageModel($config->openai->api_key, $config->openai->language_model, $logger);
 
         $vectorRAG = new VectorRAG($vectorDB, $embedding, $languageModel, $logger);
         $graphRAG = new GraphRAG($graphDB, $embedding, $languageModel, $logger);

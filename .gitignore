@@ -7,3 +7,7 @@
 *.log
 *.cache
 .aider*
+phpdoc.phar
+phpdoc.dist.xml
+phpunit.xml
+phpunit.xml.dist

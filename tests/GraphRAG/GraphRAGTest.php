@@ -64,29 +64,31 @@ class GraphRAGTest extends TestCase
 
     public function testAddRelationship()
     {
-        $fromId = 'from_id';
-        $toId = 'to_id';
-        $type = 'TEST_RELATION';
-        $attributes = ['key' => 'value'];
-
-        $this->kg->expects($this->exactly(2))
-            ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($fromId, $toId) {
-                if ($id === $fromId) {
-                    return new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $fromId]);
-                } elseif ($id === $toId) {
-                    return new \HybridRAG\KnowledgeGraph\Entity('entities', ['id' => $toId]);
-                }
-                return null;
-            });
-
-        $this->kg->expects($this->once())
-            ->method('addRelationship')
-            ->willReturn('relation_id');
-
-        $result = $this->graphRAG->addRelationship($fromId, $toId, $type, $attributes);
-
-        $this->assertEquals('relation_id', $result);
+        $entity1 = new Entity('entity1_id', ['name' => 'Entity 1']);
+        $entity2 = new Entity('entity2_id', ['name' => 'Entity 2']);
+        
+        // Assuming you have a method to add entities to the graph
+        $this->graphRAG->addEntity($entity1->getId(), $entity1->getProperties());
+        $this->graphRAG->addEntity($entity2->getId(), $entity2->getProperties());
+        
+        // Create a relationship between the two entities
+        $relationship = new Relationship($entity1, $entity2, ['type' => 'related_to']);
+        
+        // Add the relationship to the graph
+        $this->graphRAG->addRelationship($relationship);
+        
+        // Assertions to verify the relationship was added correctly
+        $relationships = $this->graphRAG->getRelationships($entity1->getId());
+        
+        // Check that the relationship exists
+        $this->assertNotEmpty($relationships, "No relationships found for entity1_id");
+        
+        // Verify that the relationship is correctly formed
+        $this->assertCount(1, $relationships, "Expected one relationship for entity1_id");
+        
+        $this->assertEquals('related_to', $relationships[0]['type'], "Relationship type does not match");
+        $this->assertEquals($entity1->getId(), $relationships[0]['from'], "From entity ID does not match");
+        $this->assertEquals($entity2->getId(), $relationships[0]['to'], "To entity ID does not match");
     }
 
     public function testAddRelationshipWithNonExistentEntities()
