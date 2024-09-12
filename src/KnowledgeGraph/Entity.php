@@ -45,7 +45,10 @@ class Entity
      */
     public function getId(): string
     {
-        return $this->id; // Ensure this returns a string
+        if (!$this->id) {
+            throw new \RuntimeException("Entity ID is not set.");
+        }
+        return $this->id;
     }
 
     /**
