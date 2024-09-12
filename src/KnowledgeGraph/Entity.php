@@ -13,20 +13,19 @@ use ArangoDBClient\Document;
  */
 class Entity
 {
-    private Document $document;
+    private string $id; // Ensure this is a string type
+    private array $properties;
 
     /**
      * Entity constructor.
      *
-     * @param string $collection The collection to which this entity belongs
+     * @param string $id The ID of the entity
      * @param array $properties The properties of the entity
      */
-    public function __construct(string $collection, array $properties)
+    public function __construct(string $id, array $properties = [])
     {
-        $this->document = new Document();
-        foreach ($properties as $key => $value) {
-            $this->document->set($key, $value);
-        }
+        $this->id = $id; // Initialize the ID
+        $this->properties = $properties;
     }
 
     /**
@@ -46,7 +45,7 @@ class Entity
      */
     public function getId(): string
     {
-        return $this->document->getId();
+        return $this->id; // Ensure this returns a string
     }
 
     /**
