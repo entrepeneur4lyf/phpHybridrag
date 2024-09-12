@@ -5,7 +5,7 @@ return [
         'host' => getenv('CHROMADB_HOST') ?? 'localhost',
         'port' => getenv('CHROMADB_PORT') ?? 8000,
         'persistence' => true,
-        'collection' => getenv('CHROMADB_COLLECTION') ?? null,
+        'collection' => getenv('CHROMADB_COLLECTION') ?? 'default_collection',
     ],
     'arangodb' => [
         'host' => getenv('ARANGODB_HOST') ?? 'localhost',

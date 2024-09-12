@@ -44,6 +44,9 @@ class NERClassifier implements \Phpml\Classification\Classifier
      */
     public function train(array $samples, array $labels): void
     {
+        if (!$this->vectorizer) {
+            $this->vectorizer = new TokenCountVectorizer(new WordTokenizer());
+        }
         $features = $this->vectorizer->fit($samples)->transform($samples);
         $this->classifier->train($features, $labels);
     }
